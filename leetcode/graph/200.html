@@ -1,0 +1,107 @@
+<html>
+  <head style="background: lightseagreen">
+    <button id="debounce" onClick="runProgram(2)">200 岛屿数</button>
+  </head>
+
+  <body></body>
+  <script>
+    function runProgram(val) {
+      if (val === 2) {
+        let grid = [
+          ["1", "1", "1", "1", "0"],
+          ["1", "1", "0", "1", "0"],
+          ["1", "1", "0", "0", "0"],
+          ["0", "0", "0", "0", "0"],
+        ];
+        const res1 = f200_dfs(grid);
+        console.log(res1);
+      }
+    }
+
+    // 题目200 广度优先解决 BFS
+    function turnzero(queue, grid) {
+      let dirs = [
+        [0, 1],
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+      ];
+      while (queue.length) {
+        // debugger
+        const curr = queue.shift(); // 取出队列的第一个元素
+        for (const dir of dirs) {
+          const x = curr[0] + dir[0];
+          const y = curr[1] + dir[1];
+          if (
+            x < 0 ||
+            x >= grid.length ||
+            y < 0 ||
+            y >= grid[0].length ||
+            grid[x][y] == "0"
+          ) {
+            continue;
+          }
+          grid[x][y] = "0";
+          queue.push([x, y]);
+        }
+      }
+    }
+    function f200_bfs(grid) {
+      if (grid == null || grid.length == 0) {
+        return 0;
+      }
+      let nr = grid.length;
+      let nc = grid[0].length;
+      let count = 0;
+      let queue = [];
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid[i][j] == "1") {
+            ++count;
+            grid[i][j] = "0";
+            queue.push([i, j]);
+            turnzero(queue, grid);
+          }
+        }
+      }
+      return count;
+    }
+
+    // 题目f200  用深度优先解决 DFS
+    function turnZero_dfs(grid, x, y) {
+      if (
+        x < 0 ||
+        x >= grid.length ||
+        y < 0 ||
+        y >= grid[0].length ||
+        grid[x][y] == "0"
+      )
+        return;
+      grid[x][y] = "0";
+      turnZero_dfs(grid, x - 1, y);
+      turnZero_dfs(grid, x + 1, y);
+      turnZero_dfs(grid, x, y - 1);
+      turnZero_dfs(grid, x, y + 1);
+    }
+
+    function f200_dfs(grid) {
+      if (grid == null || grid.length == 0) {
+        return 0;
+      }
+      let nr = grid.length;
+      let nc = grid[0].length;
+      let count = 0;
+
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid[i][j] === "1") {
+            ++count;
+            turnZero_dfs(grid, i, j);
+          }
+        }
+      }
+      return count;
+    }
+
+  </script>
+</html>

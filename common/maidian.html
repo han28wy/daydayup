@@ -1,0 +1,48 @@
+import axios from '../http/http';
+
+// 获取首页icon
+export const getServiceList = () => {
+    let resMap = new Map();
+    let params = {
+        version: null,
+        showType: 2
+    };
+    return new Promise((resolve)=>{
+        axios.post('app/home/serviceList', params).then(res=>{
+            res.data.forEach(item=>{
+                if(item.appServiceRoute.indexOf('#')>0){
+                    let f = item.appServiceRoute.split('#');
+                    resMap.set(f[1],'MAIN_ICON_'.concat(item.serviceCode.toUpperCase()));
+                }
+            });
+            resolve(resMap);
+        });
+    });
+};
+
+// import { getServiceList } from '@/utils/maidian.js';
+// console.log('要获取triggerMap');
+// const triggerMap = await getServiceList();
+// console.log('吉尼ysdfasdfsdfasdfyy斯    ',triggerMap);
+// if (triggerMap.get(to.path)) {
+//     await store.dispatch('markH5Opened', { index: 1, path: triggerMap.get(to.path), from: to.path});
+// }
+// 和家亲环境打开H5页面埋点 仅有业主身份
+// if(hjqTrigger){
+//     if (triggerMap.get(to.path)) {
+//         await store.dispatch('markH5Opened', { index: 1, path: triggerMap.get(to.path), from: to.path});
+//     }
+// }
+// if (isWeixin()) {
+//     // 微信环境打开H5页面埋点 仅有业主身份
+//     if(triggerMap.get(to.path)){
+//         await store.dispatch('markH5Opened', { index: 0, path: triggerMap.get(to.path), from: to.path});
+//     }
+// }
+// // 只在h5埋点
+// if(!isWeixin() && !isHjq() && !isApp()){
+//     if(triggerMap.get(to.path)){
+//         await store.dispatch('markH5Opened', { index: 2, path: triggerMap.get(to.path) , from: to.path});
+//     }
+// }
+// 埋点

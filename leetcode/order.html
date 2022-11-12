@@ -1,0 +1,236 @@
+<html>
+  <head style="background: lightseagreen">
+    header
+  </head>
+
+  <body>
+    <button id="debounce" onClick="runProgram(1)">15 三数之和</button>
+    <button id="debounce" onClick="runProgram(2)">16 最接近的三数之和</button>
+    <button id="debounce" onClick="runProgram(3)">18 四数之和</button>
+    <button id="debounce" onClick="runProgram(4)">49</button>
+    <button id="debounce" onClick="runProgram(5)">56</button>
+    <button id="debounce" onClick="runProgram(6)">88</button>
+  </body>
+  <script>
+    function runProgram(val) {
+      // if (val === 1) {
+      //   let arr = [-1, 0, 1, 2, -1, -4];
+      //   const res1 = fifteen(arr);
+      //   console.log(res1);
+      // }
+      // if (val === 2) {
+      //   let nums = [-1, 2, 1, -4];
+      //   let target = 1;
+      //   const res1 = sixteen(nums, target);
+      //   console.log(res1);
+      // }
+      // if (val === 3) {
+      //   let nums = [1, 0, -1, 0, -2, 2];
+      //   let target = 0;
+      //   const res1 = eighteen(nums, target);
+      //   console.log(res1);
+      // }
+      // if (val === 4) {
+      //   let arr = ["eat", "tea", "tan", "ate", "nat", "bat"];
+      //   const res1 = fortyNine(arr);
+      //   console.log(res1);
+      // }
+      if (val === 5) {
+        let intervals = [
+          [1, 3],
+          [2, 6],
+          [8, 10],
+          [15, 18],
+        ];
+        const res1 = intervalsF(intervals);
+        console.log(res1);
+      }
+      if (val === 6) {
+        nums1 = [1, 2, 3, 0, 0, 0];
+        m = 3;
+        nums2 = [2, 5, 6];
+        n = 3;
+        const res1 = merge(nums1, m, nums2, n);
+        console.log(res1);
+      }
+    }
+
+    // function fifteen(nums) {
+    //   nums = nums.sort((a, b) => a - b);
+    //   var len = nums.length;
+    //   // 特殊情况处理
+    //   if (len < 3 || nums[0] > 0) return [];
+    //   var res = [];
+    //   // 设置第一个值 锚定值
+    //   for (let i = 0; i < len - 2 && nums[i] <= 0; i++) {
+    //     let L = i + 1;
+    //     let R = len - 1;
+    //     if (i > 0 && nums[i] == nums[i - 1]) continue; // 去重
+    //     while (L < R) {
+    //       let sums = nums[i] + nums[L] + nums[R];
+    //       if (sums === 0) {
+    //         res.push([nums[i], nums[L], nums[R]]);
+    //         while (L < R && nums[L] == nums[L + 1]) L++; // 去重
+    //         while (L < R && nums[R] == nums[R - 1]) R--; // 去重
+    //         L++;
+    //         R--;
+    //       } else if (sums < 0) {
+    //         L++;
+    //       } else {
+    //         R--;
+    //       }
+    //     }
+    //   }
+    //   return res;
+    // }
+
+    // // 给你一个长度为 n 的整数数组 nums 和 一个目标值 target。
+    // // 请你从 nums 中选出三个整数，使它们的和与 target 最接近。
+    // function sixteen(nums, target) {
+    //   nums = nums.sort((a, b) => a - b);
+    //   var len = nums.length;
+    //   // 设置第一个值 锚定值
+    //   var res = nums[0] + nums[1] + nums[len - 1];
+    //   for (let i = 0; i < len - 2; i++) {
+    //     let L = i + 1;
+    //     let R = len - 1;
+    //     while (L < R) {
+    //       let sum = nums[i] + nums[L] + nums[R];
+    //       if (Math.abs(res - target) > Math.abs(sum - target)) {
+    //         res = sum;
+    //       }
+    //       if (sum < target) {
+    //         L++;
+    //       } else if (sum > target) {
+    //         R--;
+    //       } else {
+    //         return sum;
+    //       }
+    //     }
+    //   }
+    //   return res;
+    // }
+
+    function eighteen(nums, target) {
+      // 没有做出来，这个超过时间限制
+      nums = nums.sort((a, b) => a - b);
+      if (len < 4) return [];
+      var len = nums.length;
+      var res = [];
+      for (let i = 0; i < len - 3; i++) {
+        if (nums[i] === nums[i - 1]) continue;
+        // if (nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) {
+        //     break;
+        // }
+        // if (nums[i] + nums[len - 3] + nums[len - 2] + nums[len - 1] < target) {
+        //     continue;
+        // }
+        for (let j = i + 1; i < len - 2; j++) {
+          if (j > i + 1 && nums[j] === nums[j - 1]) continue;
+          // if (nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target) {
+          //       break;
+          //   }
+          //   if (nums[i] + nums[j] + nums[len - 2] + nums[len - 1] < target) {
+          //       continue;
+          //   }
+          let L = j + 1;
+          let R = len - 1;
+          while (L < R) {
+            // debugger;
+            let sum = nums[i] + nums[j] + nums[L] + nums[R];
+            if (sum === target) {
+              console.log("出现等于WSS");
+              res.push([nums[i], nums[j], nums[L], nums[R]]);
+              console.log(res);
+              while (L < R && nums[L] === nums[L + 1]) L++;
+              while (L < R && nums[R] === nums[R - 1]) R--;
+              L++;
+              R--;
+            } else if (sum < target) {
+              L++;
+            } else {
+              R--;
+            }
+          }
+        }
+      }
+      console.log(123, res);
+      return res;
+    }
+    function fortyNine(strs) {
+      var resultMap = new Map();
+      for (str of strs) {
+        // debugger;
+        let arr = Array.from(str); //复制一下
+        arr.sort();
+        let key = arr.toString();
+        let list = resultMap.get(key);
+        if (list) {
+          list.push(str);
+        } else {
+          list = [];
+          list.push(str);
+          resultMap.set(key, list);
+        }
+      }
+      console.log(resultMap.values());
+      return Array.from(resultMap.values());
+    }
+
+    function intervalsF(intervals) {
+      intervals = intervals.sort((a, b) => a[0] - b[0]);
+      let res = [];
+      let curr = intervals[0];
+      res.push(curr);
+      for (item of intervals) {
+        if (curr[1] >= item[0]) {
+          if (curr[1] < item[1]) {
+            // 需要修改这个区间的最大值
+            console.log("需要修改最大区间的值");
+            res[res.length - 1][1] = item[1];
+          }
+        } else {
+          // 需要新增一个区间
+          curr = item;
+          res.push(item);
+        }
+      }
+      return res;
+    }
+    function merge(nums1, m, nums2, n) {
+      // 这个是双指针的方法
+      // let p1=0
+      // let p2=0
+      // let res = []
+      // while(p1<m || p2<n){
+      //   while (nums1[p1] === 0) p1++
+      //   while (nums2[p2] === 0) p2++
+      //   if(nums1[p1]<=nums2[p2]){
+      //     res.push(nums1[p1])
+      //     p1++
+      //   }else{
+      //     res.push(nums2[p2])
+      //     p2++
+      //   }
+      // }
+      // return res
+
+      // 这里有一个三指针的方法
+      let i = m - 1,
+        j = n - 1,
+        k = m + n - 1;
+      while (i >= 0 || j >= 0) {
+        if (i === -1) {
+          nums1[k--] = nums2[j--];
+        } else if (j === -1) {
+          nums1[k--] = nums1[i--];
+        } else if (nums2[j] > nums1[i]) {
+          nums1[k--] = nums2[j--];
+        } else {
+          nums1[k--] = nums1[i--];
+        }
+      }
+      return nums1;
+    }
+  </script>
+</html>

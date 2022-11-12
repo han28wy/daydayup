@@ -1,0 +1,315 @@
+<html>
+  <head style="background: lightseagreen">
+    header
+  </head>
+  <body>
+    <footer></footer>
+  </body>
+  <script>
+    //NO.1 手写new
+    // 创建一个继承自func.prototype的新对象
+    //截取new1函数第二个以及第二个之后的参数,在newObj作用域内执行改造函数func
+    //如果传入参数中的构造函数执行后的returnObj是“对象”类型(比如new1(Object)),那么这个对象会取代newObj作为返回的对象
+    function new1(func) {
+      var newObj = Object.create(func.prototype);
+      var returnObj = func.apply(
+        newObj,
+        Array.prototype.slice.call(arguments, 1)
+      );
+      if (
+        (typeof returnObj === "object" || typeof returnObj === "function") &&
+        ret !== null
+      ) {
+        return returnObj;
+      }
+      return newObj;
+    }
+    // 新生成一个对象,且新对象的原型对象继承自构造对象的原型对象
+    // 以第二次执行函数的参数,在obj作用域中执行func
+    // 同理,returnObj是“对象”类型(比如new1(Object)),那么这个对象会取代newObj作为返回的对象
+    function new2(func) {
+      return function () {
+        let newObj = {
+          __proto__: func.prototype,
+        };
+        var returnObj = func.apply(obj, arguments);
+        if (
+          (typeof returnObj === "object" || typeof returnObj === "function") &&
+          returnObj !== null
+        ) {
+          return returnObj;
+        }
+        return newObj;
+      };
+    }
+    // console.log(new1("ssss"));
+    //NO.2 防抖 最后一次触发算起，间隔单位事件再执行
+    function debounce(fn, wait) {
+      var timer = null;
+      return function () {
+        clearTomeout(timer);
+        timer = setTimeout(() => {
+          fn();
+        }, wait);
+      };
+    }
+
+    //NO.3 节流 单位事件内只触发一次
+    var flag = false;
+    function throttle(fn, wait) {
+      if (!flag) {
+        console.log("现在不能执行");
+        return;
+      }
+      flag = false;
+      setTimeout(() => {
+        fn();
+        flag = true;
+      }, wait);
+    }
+    function fn() {
+      console.log("这是fn");
+    }
+
+    // NO.4 手写instanceof     animal instanceof Bark); // true
+    //用于判断构造函数的 prototype 属性是否出现在对象的原型链中的任何位置
+    // 实现步骤：1获取类型的原型对象 2获取对象的原型 3一直循环判断对象的原型是否等于类型的原型，知道对象原型为null
+    function myInstanceof(left, right) {
+      let proto = Object.getPrototypeOf(left), // 获取对象的原型
+        prototype = right.prototype; // 获取构造函数的 prototype 对象
+
+      // 判断构造函数的 prototype 对象是否在对象的原型链上
+      while (true) {
+        if (!proto) return false;
+        if (proto === prototype) return true;
+
+        proto = Object.getPrototypeOf(proto);
+      }
+    }
+
+    // 手写call bind apply
+    // call：把this绑定到入参obj上；obj1.myFun.call(obj2)；     apply:  bind:
+    Function.prototype.myCall = function (context) {
+      if (typeof this !== "function") {
+        throw new Error("类型不正确");
+      }
+      let args = [...arguments].slice(1),
+        result = null;
+      // 判断 context 是否传入，如果未传入则设置为 window
+      context = context || window;
+      // 将调用函数设为对象的方法
+      context.fn = this;
+      // 调用函数
+      result = context.fn(...args);
+      // 将属性删除
+      delete context.fn;
+      return result;
+    };
+
+    // 手写promise
+    class myPromise {
+      constructor(excuteFunction) {
+        this.initThis();
+        this.initValue();
+        try {
+          excuteFunction(this.resolve, this.reject);
+        } catch (e) {
+          this.reject(e);
+        }
+      }
+      initThis() {
+        this.resolve = this.resolve.bind(this);
+        this.reject = this.reject.bind(this);
+      }
+      initValue() {
+        this.promiseState = "pending";
+        this.promiseResult = null;
+      }
+      resolve(result) {
+        // 只能执行第一个
+        if (this.promiseState !== "pending") return;
+        this.promiseState = "fulfilled";
+        this.promiseResult = result;
+      }
+      reject(error) {
+        // 只能执行第一个
+        if (this.promiseState !== "pending") return;
+        this.promiseState = "rejected";
+        this.promiseResult = error;
+      }
+    }
+
+    const test1 = new myPromise((resolve) => {
+      console.log(123);
+      resolve("success");
+      reject("fall");
+    });
+    console.log(test1);
+
+    // 手写promise.all  只有所有子promise都返回resolved才执行then
+    // 但是怎么接受所有promise的返回结果呢
+    function promiseAll(promises) {
+      return new Promise(
+        function (resolve, reject) {
+          if (!Array.isArray(promises)) {
+            throw new TypeError("需要传入array");
+          }
+          var resolveResult = [];
+          let count = 0;
+          for (let i = 0; i < promises.length; i++) {
+            Promise.resolve(promises[i]).then((value) => {
+              count++;
+              resolveResult[i] = value; // 需要参数的顺序把结果放到数组里
+              // if (i === promises.length - 1) { //  到最后一个了,这里用i的判断方法是错误的，因为运行到这里，i的数值和顺序无关
+              //   return resolve(resolveResult);
+              // }
+              if (count === promises.length) {
+                return resolve(resolveResult);
+              }
+            });
+          }
+        },
+        (error) => {
+          return reject(error);
+        }
+      );
+    }
+    // test promise.all
+    let p1 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(1);
+      }, 1000);
+    });
+    let p2 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(2);
+      }, 2000);
+    });
+    let p3 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(3);
+      }, 3000);
+    });
+    // promiseRace([p3, p1, p2]).then((res) => {
+    //   console.log(res); // [3, 1, 2]
+    // });
+
+    // 手写promise.race
+    function promiseRace(promises) {
+      return new Promise(
+        function (resolve, reject) {
+          for (let i = 0; i < promises.length; i++) {
+            promises[i].then((result) => {
+              return resolve(result);
+            });
+          }
+        },
+        (error) => {
+          return reject(error);
+        }
+      );
+    }
+
+    // 手写发布-订阅模式(事件总线)
+    // 当一个对象的状态发送改变时，所有依赖于它的对象都将得到状态改变的通知。
+    // 订阅者（Subscriber）把自己想订阅的事件注册（Subscribe）到调度中心（Event Channel。
+    // 当发布者（Publisher）发布该事件（Publish Event）到调度中心，也就是该事件触发时，
+    // 由调度中心统一调度（Fire Event）订阅者注册到调度中心的处理代码。
+    class EventEmitter {
+      constructor() {
+        // 用来存放注册的事件与回调
+        this._events = {};
+      }
+      // 实现事件订阅
+      on(eventName, callback) {
+        // 由于一个事件可能注册多个回调函数，所以使用数组来存储事件队列
+        const callbacks = this._events[eventName] || [];
+        callbacks.push(callback);
+        this._events[eventName] = callbacks;
+      }
+      // 实现事件发布
+      emit(eventName, ...args) {
+        // args 用于收集发布事件时传递的参数
+        const callbacks = this._events[eventName] || [];
+        callbacks.forEach((cb) => cb(...args));
+      }
+      // 取消事件订阅
+      off(eventName, callback) {
+        const callbacks = this._events[eventName] || [];
+
+        const newCallbacks = callbacks.filter(
+          (fn) =>
+            fn != callback &&
+            fn.initialCallback != callback /* 用于once的取消订阅 */
+        );
+
+        this._events[eventName] = newCallbacks;
+      }
+      // 实现事件单次订阅
+      once(eventName, callback) {
+        // 由于需要在回调函数执行后，取消订阅当前事件，所以需要对传入的回调函数做一层包装,然后绑定包装后的函数
+        const one = (...args) => {
+          // 执行回调函数
+          callback(...args);
+          // 取消订阅当前事件
+          this.off(eventName, one);
+        };
+      }
+    }
+
+    // 循环打印：红灯 3s 亮一次，绿灯 1s 亮一次，黄灯 2s 亮一次；如何让三个灯不断交替重复亮灯？
+    // function trafficLight() {
+    //   console.log('我在traffic')
+    //   red()
+    // }
+    // function red() {
+    //   setTimeout(() => {
+    //     console.log("red",new Date());
+    //     green()
+    //   }, 3000);
+    // }
+    // function green() {
+    //   setTimeout(() => {
+    //     console.log("green",new Date());
+    //     yellow()
+    //   }, 1000);
+    // }
+    // function yellow() {
+    //   setTimeout(() => {
+    //     console.log("yellow",new Date());
+    //     red()
+    //   }, 2000);
+    // }
+    // trafficLight()
+
+    function red() {
+      console.log("red", new Date());
+    }
+    function green() {
+      console.log("green", new Date());
+    }
+    function yellow() {
+      console.log("yellow", new Date());
+    }
+    const task = (timer, light) =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (light === "red") {
+            red();
+          } else if (light === "green") {
+            green();
+          } else if (light === "yellow") {
+            yellow();
+          }
+          resolve();
+        }, timer);
+      });
+    const step = () => {
+      task(3000, "red")
+        .then(() => task(2000, "green"))
+        .then(() => task(2100, "yellow"))
+        .then(step);
+    };
+    step();
+  </script>
+</html>

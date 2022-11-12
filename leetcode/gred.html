@@ -1,0 +1,113 @@
+<html>
+  <head style="background: lightseagreen">
+    贪心
+  </head>
+  <body>
+    <button id="debounce" onClick="runProgram(1)">11 盛水最多</button>
+    <button id="debounce" onClick="runProgram(2)">45 最小跳跃</button>
+    <button id="debounce" onClick="runProgram(5)">46 全排列</button>
+    <button id="debounce" onClick="runProgram(3)">55 跳跃游戏</button>
+    <button id="debounce" onClick="runProgram(4)">122 股票2</button>
+  </body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        let arr = [1, 8, 6, 2, 5, 4, 8, 3, 7];
+        const res1 = water(arr);
+        console.log(res1);
+      }
+      if (val === 2) {
+        let arr = [2, 3, 1, 1, 4];
+        const res1 = minJump(arr);
+        console.log(res1);
+      }
+      if (val === 3) {
+        let arr = [1,0,0,];
+        //let arr = [3,0,8,2,0,0,1];
+        const res1 = jump(arr);
+        console.log(res1);
+      }
+      if (val === 4) {
+        let arr = [7,6,4,3,1];
+        const res1 = stock(arr);
+        console.log(res1);
+      }
+      if (val === 5) {
+        let arr = [7,6,4,3,1];
+        const res1 = f46(arr);
+        console.log(res1);
+      }
+    }
+
+    function water2(height) {
+      //果然超过时间限制了
+      let len = height.length;
+      if (len === 1) return 0;
+      let res = 0;
+      for (let i = 0; i < len - 1; i++) {
+        for (let j = i + 1; j < len; j++) {
+          let curr = (j - i) * Math.min(height[i], height[j]);
+          res = Math.max(res, curr);
+        }
+      }
+      return res;
+    }
+    function water(height) {
+      // 双指针 每次移动height[i]对应更小的值
+      let len = height.length;
+      if (len === 1) return 0;
+      let L = 0
+      let R = height.length - 1;
+      let res = 0;
+      while (L < R) {
+        let curr = (R - L) * Math.min(height[L], height[R]);
+        res = Math.max(res, curr);
+        if (height[L] < height[R]) {
+          L++;
+        } else {
+          R--;
+        }
+      }
+      return res;
+    }
+    function minJump(nums) {
+      // 跳完后能到达的最远位置（不管能不能到达终点） 最远位置：nums[k]+k；
+      // 每一次的搜索区间是：[i+1, nums[i]+i]
+      let jumpNum = 0;
+      let start = 0;
+      let end = 1;
+      while (end < nums.length) {
+        let max = 0;
+        for (let i = start + 1; i <= nums[start] + start + 1; i++) {
+          max = Math.max(max, nums[i]+i);
+        }
+        start = end;// 下一次起跳点范围开始的格子
+        end = max + 1;// 下一次起跳点范围结束的格子
+        jumpNum++;  // 跳跃次数
+      }
+      return jumpNum;
+    }
+    function jump(nums) {
+      let max = 0;
+      if(nums.length === 1) return true
+      for (let i = 0; i < nums.length; i++) {
+        if (max < i) {
+          return false;
+        }
+        max = Math.max(nums[i] + i, max);
+        if (max >= nums.length-1) return true;
+      }
+    }
+    function stock(prices){
+      // 贪心算法；问题简化为有多少个小区间，之和最大
+      let res = 0
+      for(let i=1;i<prices.length;i++){
+        res = Math.max(res, res+prices[i]-prices[i-1])
+      }
+      return res
+    }
+    function f46(nums){
+
+    }
+  </script>
+</html>

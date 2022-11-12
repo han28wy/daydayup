@@ -1,0 +1,43 @@
+<html>
+    <head>MVVM</head>
+    <body>
+
+    </body>
+    <script>
+        // 实现双向数据绑定mvvm
+    // Object.defineProperties劫持数据(属性所在对象，属性名，一个描述符对象)
+// 描述性对象有下面几种属性，configurable,enumerable,writable,value
+//第一步遍历对象的每个属性，添加监听器
+// function observe(data){
+//     if(data === null || typeof data !== 'object') return 
+//     for(let item in data){
+//         defineProp(data,item, data[item])
+//     }
+// }
+// function defineProp(data,key,childValue){
+//     observe(childValue) //在监听子属性
+//     Object.defineProperties(data,key,{
+//         set:(newValue)=>{
+//             console.log('我再set新属性')
+//             childValue = newValue
+//         },
+//         get:()=>{
+//             return childValue
+//         },
+//         enumerable:true,
+//         cofigurable:false
+//     })
+// }
+
+// const dataTest={
+//     name:'han',
+//     lastName: 'xue',
+//     age: 20,
+//     sex:0
+// }
+// observe(dataTest)
+// dataTest.name = 'hhhh'
+// console.log(dataTest.name)
+
+    </script>
+</html>

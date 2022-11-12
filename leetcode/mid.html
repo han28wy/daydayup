@@ -1,0 +1,511 @@
+<html>
+
+<head style="background: lightseagreen">
+  中等难度的题目
+</head>
+
+<body>
+  <button id="debounce" onClick="runProgram(1)">17 电话号码组合</button>
+  <button id="debounce" onClick="runProgram(6)">18 四数和</button>
+  <button id="debounce" onClick="runProgram(7)">23 合并升序链表</button>
+  <button id="debounce" onClick="runProgram(5)">33 搜索旋转排序数组</button>
+  <button id="debounce" onClick="runProgram(8)">34 排序数组中查找位置</button>
+  <button id="debounce" onClick="runProgram(2)">45 最小跳跃</button>
+  <button id="debounce" onClick="runProgram(3)">55 跳跃游戏</button>
+  <button id="debounce" onClick="runProgram(13)">78 子集-回溯算法</button>
+  <button id="debounce" onClick="runProgram(4)">122 股票2</button>
+  <button id="debounce" onClick="runProgram(9)">128 最长连续序列</button>
+  <button id="debounce" onClick="runProgram(10)">136 只出现一次的数字</button>
+  <button id="debounce" onClick="runProgram(11)">139 单词拆分-动态规划</button>
+  <button id="debounce" onClick="runProgram(12)">200 岛屿数量</button>
+</body>
+<script>
+  function runProgram(val) {
+    if (val === 1) {
+      let arr = "23";
+      const res1 = telephone(arr);
+      console.log(res1);
+    }
+    if (val === 5) {
+      let nums = [1, 3],
+        target = 1;
+      const res1 = f33(nums, target);
+      console.log(res1);
+    }
+    if (val === 6) {
+      let nums = [-2, -1, -1, 1, 1, 2, 2],
+        target = 0;
+      const res1 = f18(nums, target);
+      console.log(res1);
+    }
+    if (val === 7) {
+      let nums = [-2, -1, -1, 1, 1, 2, 2],
+        target = 0;
+      const res1 = f23(lists);
+      console.log(res1);
+    }
+    if (val === 8) {
+      let nums = [5, 7, 7, 8, 8, 10],
+        target = 8
+      const res1 = f34(nums, target);
+      console.log(res1);
+    }
+    if (val === 9) {
+      let nums = [9, 1, 4, 7, 3, -1, 0, 5, 8, -1, 6]
+      const res1 = f128(nums);
+      console.log(res1);
+    }
+    if (val === 10) {
+      let nums = [4, 2, 2, 1, 1]
+      const res1 = f136(nums);
+      console.log(res1);
+    }
+    if (val === 11) {
+      let s = "leetcode",
+        wordDict = ["leet", "code"]
+      const res1 = f139(s, wordDict);
+      console.log(res1);
+    }
+    if (val === 12) {
+      let grid = [
+        ["1", "1", "1"],
+        ["0", "1", "0"],
+        ["1", "1", "1"]
+      ]
+      const res1 = f200(grid);
+      console.log(res1);
+    }
+    if (val === 13) {
+      let grid = [1, 2, 3, 4]
+      const res1 = f78(grid);
+      console.log(res1);
+    }
+  }
+
+  function f78(nums) {
+    let result = []
+    let path = []
+
+    function backtracking(startIndex) {
+      result.push(path.slice())
+      for (let i = startIndex; i < nums.length; i++) {
+        path.push(nums[i])
+        backtracking(i + 1)
+        path.pop()
+      }
+    }
+    backtracking(0)
+    return result
+  };
+
+  // function f78(nums) {
+  //   if (nums.length === 0) return []
+  //   let dp = new Array(nums.length).fill([])
+  //   dp[0] = []
+  //   for (let i = 1; i < nums.length; i++) {
+  //     let temp = dp[i - 1].concat()
+  //     let result = []
+  //     for (let j = 0; j < nums.length; j++) {
+  //       let arr = temp[j].concat()
+  //       result.push(temp[j])
+  //       arr.push(nums[i])
+  //       result.push(arr)
+  //     }
+  //     dp[i] = result.concat()
+  //   }
+  //   return dp[num.length - 1]
+  // }
+  // 网格DFS遍历
+  // 遍历整个矩阵，当curr = 1时开始做深度有限搜索dfs 岛屿数量count+1,并且删除此岛屿
+  function dfs(i, j, grid) {
+    if (i < 0 || j < 0 || i >= grid.length || j >= grid[0].length || grid[i][j] === '0') {
+      console.log(i, '     ', j)
+      return
+    }
+    grid[i][j] = '0'
+    dfs(i + 1, j, grid)
+    dfs(i, j + 1, grid)
+    dfs(i - 1, j, grid)
+    dfs(i, j - 1, grid)
+  }
+
+  function f200(grid) {
+    let count = 0
+    for (let i = 0; i < grid.length; i++) {
+      for (j = 0; j < grid[0].length; j++) {
+        if (grid[i][j] === '1') {
+          dfs(i, j, grid)
+          count++
+        }
+      }
+    }
+    return count
+  }
+
+  function f200_fail(grid) {
+    let m = grid.length
+    let n = grid[0].length
+    let res = grid[0][0] == '1' ? 1 : 0
+    if (m === 1 && n === 1) return grid[0][0]
+    if (m === 1) {
+      for (let i = 1; i < n; i++) {
+        let left = i === 0 ? 0 : grid[0][i - 1]
+        if (grid[0][i] == 1) {
+          if (left == 0) {
+            res++
+          }
+        }
+      }
+      return res
+    }
+    if (n === 1) {
+      for (let j = 1; j < m; j++) {
+        let top = j === 0 ? j : grid[j - 1][0]
+        if (grid[j][0] == 1) {
+          if (top == 0) {
+            res++
+          }
+        }
+      }
+      return res
+    }
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        let cur = grid[i][j]
+        let left = j === 0 ? 0 : grid[i][j - 1]
+        let top = i === 0 ? 0 : grid[i - 1][j]
+        if (cur == 1) {
+          if (left == 0 && top == 0 && i > 0 && j > 0) {
+            console.log(' aaa ', i, '    ', j)
+            res++
+          } else if (i === 0 && left == 0) {
+            console.log(' vvv ', i, '    ', j)
+            res++
+          } else if (j === 0 && top == 0) {
+            console.log(' sss ', i, '    ', j)
+            res++
+          }
+        }
+      }
+    }
+    return res
+  }
+
+  function f139(s, wordDict) {
+    const len = s.length;
+    const wordSet = new Set(wordDict);
+    const canBreak = (start) => { // 判断从start到末尾的子串能否break
+      console.log('ssss     ', start)
+      if (start == len) { //指针越界，s一步步成功划分为单词，才走到越界这步，现在没有剩余子串
+        return true; //返回真，结束递归
+      }
+      for (let i = start + 1; i <= len; i++) { //指针i去划分两部分，for枚举出当前所有的选项i
+        const prefix = s.slice(start, i); // 切出的前缀部分
+        if (wordSet.has(prefix) && canBreak(i)) { // 前缀部分是单词，且剩余子串能break，返回真
+          return true;
+        } // 如果前缀部分不是单词，就不会执行canBreak(i)。进入下一轮迭代，再切出一个前缀串，再试
+      }
+      return false; // 指针i怎么划分，都没有返回true，则返回false
+    }
+    return canBreak(0); // 递归的入口，从0到末尾的子串能否break
+  }
+
+  // 1 1 2 2 3 4 4
+  // function f136(nums) {
+  //   if(nums.length === 1) return nums[0]
+  //   nums.sort((a, b) => a - b)
+  //   let mid = Math.ceil(nums.length / 2)
+  //   for (let i = 0; i <= mid; i++) {
+  //     console.log(nums[2 * i],'    ',nums[[2 * i + 1]])
+  //     if (2*i+1-nums.length >= 0) {
+  //       return nums[2 * i]
+  //     } else if (nums[2 * i] !== nums[2 * i + 1]) {
+  //       return nums[2 * i]
+  //     }
+  //   }
+  // }
+  function f136(nums) {
+    if (nums.length === 1) return nums[0]
+    nums.sort((a, b) => a - b)
+    for (let i = 0; i < nums.length; i + 2) {
+      if (nums[i] == nums[i + 1]) {
+        continue
+      } else {
+        return nums[i]
+      }
+      return nums[nums.length - 1]
+    }
+  }
+
+  function f128(nums) {
+    if (nums.length === 0) return 0;
+    nums.sort((a, b) => a - b)
+    let numsMap = new Set(nums)
+    let numsList = [...numsMap]
+    console.log(numsList)
+    let res = 1
+    let temp = 1
+
+    for (let i = 0; i < numsList.length; i++) {
+      if (numsList[i] + 1 !== numsList[i + 1]) {
+        res = Math.max(res, temp)
+        temp = 1
+        continue
+      } else {
+        temp++;
+      }
+    }
+    return Math.max(res, temp)
+  }
+
+  function getEdge(nums, target, isLeftEdge) {
+    let l = 0;
+    r = nums.length, res = -1
+    while (l < r) {
+      let m = Math.floor((l + r) / 2)
+      if (target < nums[m] || (isLeftEdge && target < nums[m])) {
+        r = m - 1
+        res = m
+      } else {
+        l = m + 1
+      }
+    }
+    return res
+  }
+
+  function f34(nums, target) {
+    res = [-1, -1]
+    const left = getEdge(nums, target, true)
+    const right = getEdge(nums, target, false)
+    if (left <= right && right <= nums.length && nums[left] === target && num[right] === target) {
+      return [left, right]
+    }
+
+
+  }
+
+  function telephone(digits) {
+    let phone = {
+      //电话数字到字母的映射
+      2: "abc",
+      3: "def",
+      4: "ghi",
+      5: "jkl",
+      6: "mno",
+      7: "pqrs",
+      8: "tuv",
+      9: "wxyz",
+    };
+    let arr = [];
+    for (let i of digits) {
+      arr = merge(arr, phone[i]);
+    }
+    return arr;
+  }
+
+  const merge = (arr, str) => {
+    //将str每个字符与arr已有字符串进行组合
+    let newArr = [];
+    if (arr.length === 0) {
+      //arr是空数组
+      for (let i of str) {
+        newArr.push(i);
+      }
+    } else {
+      //非空数组
+      for (let i of arr) {
+        //将arr已有字符串与str组合，存入newArr
+        for (let j of str) {
+          newArr.push(i + j);
+        }
+      }
+    }
+    return newArr;
+  };
+
+  function f18(nums, target) {
+    if (nums.length < 4) return []
+    let res = []
+    nums.sort((a, b) => a - b)
+    for (let i = 0; i < nums.length - 3; i++) {
+      // debugger
+      if (nums[i] === nums[i - 1] && i > 0) {
+        continue
+      }
+      for (let j = i + 1; j < nums.length - 2; j++) {
+        if (nums[j] === nums[j - 1] && j > i + 1) {
+          continue
+        }
+        let L = j + 1
+        let R = nums.length - 1
+        while (L < R) {
+          let sum = nums[i] + nums[j] + nums[L] + nums[R]
+          if (sum === target) {
+            res.push([nums[i], nums[j], nums[L], nums[R]])
+            while (L < R && nums[L] === nums[L + 1]) {
+              L++
+            }
+            L++
+            while (L < R && nums[R] === nums[R - 1]) {
+              R--
+            }
+            R--
+          } else if (sum < target) {
+            L++
+            // if(nums[L]===nums[++L]){
+            //   L++
+            // }
+          } else {
+            R--
+            // if(nums[R]===nums[--R]){
+            //   R--
+            // }
+          }
+        }
+      }
+    }
+    return res
+  }
+
+  function f33(lists) {
+    if (lists.length === 1) return lists[0]
+    let res = lists[0]
+    for (let i = 1; i < lists.length; i++) {
+      for (let i = 0; i < res.length; i++) {
+        if (res[i].val > lists[i][i].val) {
+          res[i - 1].next = lists[i][i]
+          lists[i][i].next = res[i]
+        }
+      }
+    }
+    return res
+  }
+
+  function f33(nums, target) {
+    let len = nums.length;
+    if (len === 0) return -1;
+    if (len === 1) {
+      return nums[0] === target ? 0 : -1;
+    }
+    let left = 0;
+    let right = len - 1;
+    while (left <= right) {
+      let mid = left + Math.floor((right - left) / 2);
+      if (nums[mid] == target) return mid;
+      // 右边有序
+      if (nums[mid] < nums[right]) {
+        // 目标值在右边
+        if (target > nums[mid] && target <= nums[right]) {
+          left = mid + 1;
+          // 目标值在左边
+        } else {
+          right = mid - 1;
+        }
+        // 左边有序
+      } else {
+        // 目标值在左边
+        if (target >= nums[left] && target < nums[mid]) {
+          right = mid - 1;
+          // 目标值在右边
+        } else {
+          left = mid + 1;
+        }
+      }
+    }
+    return -1;
+  }
+
+  function f18(nums, target) {
+    if (nums.length < 4) return []
+    let res = []
+    nums.sort((a, b) => a - b)
+    for (let i = 0; i < nums.length - 3; i++) {
+      // debugger
+      if (nums[i] === nums[i - 1] && i > 0) {
+        continue
+      }
+      for (let j = i + 1; j < nums.length - 2; j++) {
+        if (nums[j] === nums[j - 1] && j > i + 1) {
+          continue
+        }
+        let L = j + 1
+        let R = nums.length - 1
+        while (L < R) {
+          let sum = nums[i] + nums[j] + nums[L] + nums[R]
+          if (sum === target) {
+            res.push([nums[i], nums[j], nums[L], nums[R]])
+            while (L < R && nums[L] === nums[L + 1]) {
+              L++
+            }
+            L++
+            while (L < R && nums[R] === nums[R - 1]) {
+              R--
+            }
+            R--
+          } else if (sum < target) {
+            L++
+            // if(nums[L]===nums[++L]){
+            //   L++
+            // }
+          } else {
+            R--
+            // if(nums[R]===nums[--R]){
+            //   R--
+            // }
+          }
+        }
+      }
+    }
+    return res
+  }
+
+  function f23(lists) {
+    if (lists.length === 1) return lists[0]
+    let res = lists[0]
+    for (let i = 1; i < lists.length; i++) {
+      for (let i = 0; i < res.length; i++) {
+        if (res[i].val > lists[i][i].val) {
+          res[i - 1].next = lists[i][i]
+          lists[i][i].next = res[i]
+        }
+      }
+    }
+    return res
+  }
+
+  function f33(nums, target) {
+    let len = nums.length;
+    if (len === 0) return -1;
+    if (len === 1) {
+      return nums[0] === target ? 0 : -1;
+    }
+    let left = 0;
+    let right = len - 1;
+    while (left <= right) {
+      let mid = left + Math.floor((right - left) / 2);
+      if (nums[mid] == target) return mid;
+      // 右边有序
+      if (nums[mid] < nums[right]) {
+        // 目标值在右边
+        if (target > nums[mid] && target <= nums[right]) {
+          left = mid + 1;
+          // 目标值在左边
+        } else {
+          right = mid - 1;
+        }
+        // 左边有序
+      } else {
+        // 目标值在左边
+        if (target >= nums[left] && target < nums[mid]) {
+          right = mid - 1;
+          // 目标值在右边
+        } else {
+          left = mid + 1;
+        }
+      }
+    }
+    return -1;
+  }
+</script>
+
+</html>

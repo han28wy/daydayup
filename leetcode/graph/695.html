@@ -1,0 +1,97 @@
+<html>
+  <head style="background: lightseagreen">
+    <button id="debounce" onClick="runProgram(1)">695 岛屿最大面积</button>
+  </head>
+
+  <body></body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        let grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]
+        const res1 = f200_dfs(grid);
+        console.log(res1);
+      }
+    }
+    // 广度优先解决 BFS
+    function turnzero(queue, grid) {
+      let currSquare = 1
+      let dirs = [
+        [0, 1],
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+      ];
+      while (queue.length) {
+        const curr = queue.shift(); // 取出队列的第一个元素
+        for (const dir of dirs) {
+          const x = curr[0] + dir[0];
+          const y = curr[1] + dir[1];
+          if (
+            x < 0 ||
+            x >= grid.length ||
+            y < 0 ||
+            y >= grid[0].length ||
+            grid[x][y] == '0'
+          ) {
+            continue;
+          }
+          grid[x][y] = "0";
+          currSquare++;
+          queue.push([x, y]);
+        }
+      }
+      return currSquare
+    }
+    function f(grid) {
+      if (grid == null || grid.length == 0) {
+        return 0;
+      }
+      let nr = grid.length;
+      let nc = grid[0].length;
+      let queue = [];
+      let res = 0;
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid[i][j] == '1') {
+            grid[i][j] = "0";
+            queue.push([i, j]);
+            const square = turnzero(queue, grid);
+            res = Math.max(res, square)
+          }
+        }
+      }
+      return res;
+    }
+
+    // 我比较感兴趣的是深度优先方案
+    // 题目f200  用深度优先解决 DFS
+    function turnZero_dfs(grid, x, y) {
+    var currS = 1
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      if ( x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] == "0")
+        return 0;
+      grid[x][y] = "0";
+      for(dir of dirs){
+        currS+=turnZero_dfs(grid, x+dir[0], y + dir[1]);
+      }
+      return currS
+    }
+
+    function f200_dfs(grid) {
+      if (grid == null || grid.length == 0) {
+        return 0;
+      }
+      let nr = grid.length;
+      let nc = grid[0].length;
+      let res = 0
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid[i][j] == "1") {
+            res = Math.max(res,turnZero_dfs(grid, i, j));
+          }
+        }
+      }
+      return res;
+    }
+  </script>
+</html>

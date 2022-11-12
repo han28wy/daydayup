@@ -1,0 +1,86 @@
+<html>
+  <head>
+    333
+  </head>
+  <body>
+    <br />
+    <button id="debounce1">点我防抖！</button>
+    <button id="throttle">点我节流！</button>
+  </body>
+  <script>
+    var copy={
+      name:'124',
+      age:1,
+      arr: ['adf', 'rty',1,2,3],
+      other:{
+        one:1,
+        two:2
+      }
+      // function: myName(){
+      //   console.log(this.name)
+      // }
+    }
+    // var copy2 = copy
+    // copy2.name = 'abc'
+    // console.log('copy   ',copy)
+    // console.log('copy2   ',copy2) // 浅拷贝 两个obj同步改
+    // var copy3 = Object.assign(copy)
+    // copy3.name='ert'
+    // console.log('copy   ',copy)
+    // console.log('copy3   ',copy3) // 浅拷贝 两个obj同步改
+
+    var copy4 = JSON.parse(JSON.stringify(copy))
+    copy4.name = 'fgh'
+    copy4.arr = [1,2,3,4]
+    copy4.other.one = 444
+    console.log('copy   ',copy)
+    console.log('copy4   ',copy4) // 深拷贝了,第二层的也正确改好了；但是对一些特殊情况的处理有问题
+
+    ///////////////////////////////////////
+    window.onload = function () {
+      var myDebounce = document.getElementById("debounce1");
+      myDebounce.addEventListener("click", debounce(sayDebounce));
+    };
+    function debounce(fn) {
+      console.log("我在执行debounce");
+      let timeout = null;
+      return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          fn.call(this, arguments);
+        }, 1000);
+      };
+    }
+    function sayDebounce() {
+      console.log("防抖成功！");
+      document.addEventListener("click", function (e) {
+        console.log(e.clientX);
+      });
+    }
+
+    /////////////////////////
+    window.onload = function () {
+      var mythrottle = document.getElementById("throttle");
+      mythrottle.addEventListener("click", throttle(test2));
+    };
+    // 节流
+    function throttle(fn) {
+      console.log('我在click')
+      let flag = true
+      return function() {
+        if (flag) {
+        setTimeout(() => {
+          fn.apply(this, arguments);
+          // 最后在setTimeout执行完毕后再把标记设置为true(关键)
+          // 表示可以执行下一次循环了。
+          flag = true;
+        }, 2000);
+      }
+      flag = false
+      }
+    }
+    function test2() {
+      console.log("tttest ");
+    }
+  </script>
+</html>

@@ -1,0 +1,281 @@
+<html>
+  <head>
+    题目123
+  </head>
+  <body>
+    <br />
+    <button id="debounce" onClick="runProgram(1)">9 回文数</button>
+    <button id="debounce" onClick="runProgram(2)">13 罗马转数字</button>
+    <button id="debounce" onClick="runProgram(3)">14 最长公共前缀</button>
+    <button id="debounce" onClick="runProgram(4)">20 有效括号</button>
+    <button id="debounce" onClick="runProgram(5)">21 合并两个有序链表</button>
+    <button id="debounce" onClick="runProgram(6)">26 删除重复项</button>
+    <button id="debounce" onClick="runProgram(7)">27 移除元素</button>
+    <button id="debounce" onClick="runProgram(8)">28 strStr</button>
+    <button id="debounce" onClick="runProgram(9)">35 插入搜索位置</button>
+    <button id="debounce" onClick="runProgram(10)">121 买卖股票最佳时间</button>
+  </body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        const res1 = nine(-121);
+        console.log(res1);
+      }
+      if (val === 2) {
+        const res2 = romaToNum("MCMXCIV");
+        console.log(res2);
+      }
+      if (val === 3) {
+        strs = [""];
+        const res3 = commonPrefix(strs);
+        console.log(res3);
+      }
+      if (val === 4) {
+        strs = "()[]{}";
+        const res4 = validKuohao(strs);
+        console.log(res4);
+      }
+      if (val === 6) {
+        const strs = [1, 1, 2];
+        const res = deleteChongfu(strs);
+        console.log(res);
+      }
+      if (val === 7) {
+        const strs = [3, 2, 2, 3];
+        const val = 3;
+        const res = remove(strs, val);
+      }
+      if (val === 8) {
+        const haystack = "hello";
+        const needle = "lol";
+        const res = strStr(haystack, needle);
+        console.log(res);
+      }
+      if (val === 9) {
+        const nums = [1, 3, 5, 6];
+        const target = 7;
+        const res = insert(nums, target);
+        console.log(res);
+      }
+      if (val === 10) {
+        const nums = [1, 3, 5, 6];
+        const res = stock(nums);
+        console.log(res);
+      }
+    }
+    function nine(x) {
+      if (x === 0) return true;
+      if (x < 0) return false;
+      x = x.toString();
+      var len = x.length;
+      var result = true;
+      for (var i = 0; i < x.length; i++) {
+        if (x[i] !== x[len - i - 1]) {
+          result = false;
+          return false;
+        }
+      }
+      return result;
+    }
+    function romaToNum(s) {
+      // 把中文注释删掉以后性能提升好大
+      var result = 0;
+      var romaMap = new Map();
+      var skipNext = false;
+      romaMap.set("I", 1);
+      romaMap.set("V", 5);
+      romaMap.set("X", 10);
+      romaMap.set("L", 50);
+      romaMap.set("C", 100);
+      romaMap.set("D", 500);
+      romaMap.set("M", 1000);
+      romaMap.set("IV", 4);
+      romaMap.set("IX", 9);
+      romaMap.set("XL", 40);
+      romaMap.set("XC", 90);
+      romaMap.set("CD", 400);
+      romaMap.set("CM", 900);
+
+      for (var i = s.length - 1; i >= 0; i--) {
+        if (skipNext) {
+          skipNext = false;
+          continue;
+        }
+        if (i > 0 && romaMap.get(s[i - 1]) < romaMap.get(s[i])) {
+          var newIndex = String(s[i - 1]).concat(String(s[i]));
+          if (romaMap.get(newIndex)) {
+            result += romaMap.get(newIndex);
+            skipNext = true;
+          } else {
+            skipNext = false;
+            result += romaMap.get(s[i]);
+          }
+        } else {
+          skipNext = false;
+          result += romaMap.get(s[i]);
+        }
+      }
+      return result;
+    }
+
+    function commonPrefix(strs) {
+      console.log(strs.length);
+      if (strs.length <= 1) {
+        return strs[0];
+      }
+      var endIndex;
+      var target = strs[0];
+      for (var i = 0; i < target.length; i++) {
+        var skipFlag = false;
+        strs.forEach((item) => {
+          if (item[i] === null || target[i] === null || item[i] !== target[i]) {
+            endIndex = i;
+            skipFlag = true;
+            return false;
+          }
+        });
+        if (skipFlag) {
+          break;
+        }
+      }
+      return target.slice(0, endIndex);
+    }
+
+    function validKuohao(s) {
+      if (s.length % 2 === 1 || s.length === 0) {
+        return false;
+      }
+      var map = new Map();
+      map = { "{": 1, "[": 2, "(": 3, "}": -1, "]": -2, ")": -3 };
+      var list = [];
+      for (var i = 0; i < s.length; i++) {
+        // debugger
+        if (map[s[i]] > 0) {
+          list.push(map[s[i]]);
+        } else {
+          if (Number(list[list.length - 1]) + map[s[i]] === 0) {
+            list.pop();
+          } else {
+            return false;
+          }
+        }
+      }
+      return list.length === 0;
+    }
+    function lianbiao(l1, l2) {
+      let head = new ListNode();
+      let cur = head;
+      while (l1 !== null && l2 !== null) {
+        if (l1.val <= l2.val) {
+          cur.next = l1;
+          cur = l1;
+          l1 = l1.next;
+        } else {
+          cur.next = l2;
+          cur = l2;
+          l2 = l2.next;
+        }
+      }
+
+      if (l1 !== null) {
+        cur.next = l1;
+      }
+      if (l2 !== null) {
+        cur.next = l2;
+      }
+
+      return head.next;
+    }
+    function deleteChongfu(nums) {
+      // var newMap = new Map();
+      // nums.forEach((item, index) => {
+      //   if (!newMap[item]) {
+      //     newMap.set(item, 1);
+      //   } else {
+      //     return;
+      //   }
+      // });
+      // let keys = newMap.keys();
+      // nums = [...keys];
+      // console.log(nums)
+      // return newMap.size;
+      let arr = new Set(nums);
+      let x = 0;
+      for (val of arr) {
+        nums[x] = val;
+        x++;
+      }
+      return arr.size;
+    }
+    function remove(nums, val) {
+      for (var i = 0; i < nums.length; i++) {
+        var n = 0;
+        if (nums[i] !== val) {
+          nums[n] = nums[i];
+          i++;
+        }
+      }
+      return i;
+    }
+    function strStr(haystack, needle) {
+      // 双层for循环怎么跳出呢？ 用break跳出内循环，用break+flag跳出外循环
+      if (needle === "") {
+        return 0;
+      }
+      if (haystack.length < needle.length) {
+        return -1;
+      }
+      var startIndex = 0;
+      var res = -1;
+      var finishOut = false;
+      for (var i = 0; i < haystack.length - needle.length + 1; i++) {
+        if (finishOut) {
+          return res;
+        }
+        for (var j = startIndex; j < needle.length; j++) {
+          if (needle[j] === haystack[j + i]) {
+            while (j + 1 === needle.length) {
+              res = i;
+              finishOut = true;
+              break;
+            }
+          } else {
+            startIndex = 0;
+            break;
+          }
+        }
+      }
+      return res;
+    }
+    // Math.round(num) 返回一个四舍五入的整数
+    function insert(nums, target) {
+      let left = 0;
+      let right = nums.length - 1;
+      while (left <= right) {
+        //let mid = left + ((right - left) / 2);// 防止溢出
+        let mid = Math.floor((left + right) / 2);
+        if (nums[mid] === target) {
+          return mid; //相等返回
+        } else if (nums[mid] < target) {
+          left = mid + 1; // 目标值较大在右侧查找
+        } else {
+          right = mid - 1; // 目标值较小在左侧查找
+        }
+      }
+      return left;
+    }
+    function stock(prices){ // 这个叫什么动态规划
+      let res=0
+      let interval=prices.length+1
+      for(var itv=1;itv<interval;itv++){
+        for(var i=0;i<interval-itv;i++){
+          let num=prices[i+itv-1]-prices[i]
+          if(num>res){
+            res=num
+          }
+        }
+      }
+return res
+    }
+  </script>
+</html>

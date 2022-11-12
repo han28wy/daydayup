@@ -1,0 +1,61 @@
+<html>
+    <head>MVVM</head>
+    <body>
+
+    </body>
+    <script>
+        // 使用promise封装异步加载图片的方法
+        function loadPic(url){
+            return new Promise((resolve,reject)=>{
+                const img = new Image();
+                img.onload=function(){
+                    console.log("加载完图片")
+                    resolve()
+                };
+                img.onerror=function(){
+                    reject("出错")
+                } 
+                img.src=url
+            })
+
+        }
+    //    做多同时执行3个promise
+    function limitPromise(urls,handler,limit){
+        let sequence = [].concat(urls)
+        // 初始化当前promise容器
+        let promise = sequence.splice(0,limit).map((url,index)=>{
+            return handler(url).then(()=>{
+                return index // 知道了哪个最先完成
+            })
+        })
+        return sequence.reduce((pCollect,url)=>{
+            return pCollect.then(()=>{
+                return Promise.race(promises) // 返回已经完成的下标
+            }).then(fastestIndex=>{
+                promises[fastestIndex]=handler(url).then(()=>{
+                    return fastestIndex
+                })
+            }).catch(err=>{
+                console.error(err)
+            });
+        }, Promise.resolve())// 初始化传入
+        .then(()=>{
+            return Promise.all(promises)
+        })
+    }
+
+    // 计算一个html页面含有多少标签？
+    // 获取所有DOM节点；伪数组转化为数组；去重
+    function getAllTags(){
+        new Set([...document.querySelectorAll('*')].map(ele=>ele.tagName)).size
+    }
+
+    </script>
+
+    <!-- 梳理一下treeShaking-
+        
+    CommonJS用require导入是一种动态的过程；
+    import是静态的导入，意思是先导入包，然后引用的时候才知道到底需不需要； -->
+
+
+    </html>

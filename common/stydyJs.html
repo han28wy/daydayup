@@ -1,0 +1,76 @@
+<html>
+  <head style="background: lightseagreen">
+    header
+  </head>
+  <body>
+    <div id="d1">DDDiv</div>
+    <footer></footer>
+  </body>
+  <script>
+    // 理解回调函数
+    function testMain(param1, ()=>{
+      console.log('我在回调')
+    }){
+
+    }
+
+
+
+    // 监听对象属性改变 Object.defineProperty
+    const obj = {};
+    let val = obj.name;
+    Object.defineProperty(obj, "name", {
+      get(){
+          console.log('读取属性', value)
+          return value
+      },
+        set(newVal) {
+        console.warn(newVal);
+        val = newVal;
+      },
+    });
+    // setTimeout(() => { // 一秒钟后我们将obj这个对象的name属性赋值为字符串a, 看看会发生什么
+    //   obj.name = "a";
+    // }, 1000);
+    var testArray = [1,2,3,'a','b']
+    // var a = testArray.pop()
+    var b = testArray.unshift('c')
+    var c = testArray.push('d')
+    // var d = testArray.splice(0,2)
+    // console.log(d)
+    // console.log(testArray)
+    // console.log(testArray.sort())
+
+    // let aa = NaN
+    // let bb = 'NaN'
+    // console.log(Number.isNaN(aa))
+    // console.log(Number.isNaN(bb))
+
+    function Person(name,age){
+        this.name = name
+        this.age = age
+        this.fullName = name + age
+    }
+    var newP = new Person('han', 20)
+    console.log(Person.prototype)
+    console.log(newP._proto_)
+    console.log(Object.getPrototypeOf(newP))
+
+    function fun1(){console.log('我在click1')}
+    function fun2(){console.log('我在click2')}
+    var div1 = document.getElementById('d1')
+    div1.addEventListener('click', fun1)
+    div1.addEventListener('click', fun2)
+
+    // 小数相关
+    // var pai = 3.1415926
+    // console.log(Math.floor(pai)) // 3
+    // console.log(Math.round(pai)) //3
+    // console.log(pai.toFixed(3)) //3.142 小数点四舍五入保留几位,n在0~20之间，超出会报错
+    // console.log(pai.toPrecision(6)) //3.14 小数点前+小数点后
+
+    var equal1 = 1
+    var equal2 = '1'
+    console.log(equal1 === equal2)
+  </script>
+</html>

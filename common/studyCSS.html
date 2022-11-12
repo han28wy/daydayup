@@ -1,0 +1,136 @@
+<html>
+  <head style="background: lightseagreen;">
+    header
+  </head>
+  <body>
+    <div>实现轮播图</div>
+    <div class="out">
+      <div class="inner_pic">
+        <div class="pic" v-for="item in picList" :key="item.id">
+          <span>${item.text}</span>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    var picList=[
+      {id:1,text:'1'},
+      {id:2,text:'2'},
+      {id:3,text:'3'},
+      {id:4,text:'4'},
+      {id:5,text:'5'},
+    ]
+    // 听说这是一个字节实习题目
+    // const pro = new Promise((resolve,reject)=>{
+    //   console.log('1')
+    //   // setTimeout(()=>{
+    //   //   console.log('timeout')
+    //   //   resolve('2')
+    //   // })
+    //   // reject('3')
+    //   resolve('2')
+    // })
+    // console.log(4)
+    // pro.then(res=>{
+    //   console.log(res)
+    //   console.log('then 1')
+    //   // return '5'
+    // }).catch(err=>{
+    //   console.log(err)
+    //   console.log('catch 1')
+    //   return '6'
+    // }).then(res=>{
+    //   console.log('then 2  ',res)
+    //   return 'then22'
+    // }).then(res22=>{
+    //   console.log('then2222 ',res22)
+    // })
+    // 1 4 3 catch1 then2 6
+
+    //  探索async await
+
+
+//     async function fun1(){
+//       console.log('fun1')
+//       var res = await fun2() // 微任务 1-2
+//       console.log(res)
+//     }
+//     function fun2(){
+//       console.log('fun2')
+//       return 333
+//     }
+//     ////
+// async function asyFun(){
+//   await new Promise((resolve)=>{
+//     console.log('before  ')
+//     resolve('asyncFunc')
+//   }).then(res=>{
+//     console.log('ddds ', res)
+//   }).catch(err=>{
+//     console.log('ddd ',err)
+//   })
+//   console.log('777yyyy') // 如果await不返回resolve其实后面的代码都不会执行;
+// }
+
+// asyFun()
+//     ////
+//     setTimeout(()=>{
+//       console.log('timer1') // 宏任务1
+//     },0)
+//     new Promise((resolve,reject)=>{
+//       console.log('promise1')
+//       resolve('pppp1')
+//       setTimeout(()=>{
+//         console.log('创建第1 micro') // 宏任务2
+//       },0)
+//     }).then(res=>{ // 微任务 1-1
+//       setTimeout(()=>{
+//         console.log('创建第2 micro') // 宏任务2-1
+//       },0) 
+//       console.log('pomise-then1 ',res)
+//       return 'then2222'
+//     }).then(res2=>{ // 微任务2-1
+//       setTimeout(()=>{
+//         console.log('创建第3 micro') // 宏任务2-2
+//       },0)
+//       console.log('第二个then ',res2)
+//     })
+//     fun1()
+//     setTimeout(()=>{
+//       console.log('timer2')  // 宏任务3
+//     },0)
+
+// Promise.reject('err!!!!').then((res)=>{
+//   console.log('success ',res)
+// }, (err)=>{console.log('error',err)}).catch(err=>{
+//   console.log('catch   ',err)
+// })
+
+// Promise.resolve(1).then(2).then(Promise.resolve(3)).then(res=>console.log(res))
+
+// new Promise((resolve)=>{
+//   console.log(1)
+//   setTimeout(()=>{
+//     console.log(2)
+//     resolve(3)
+//   },1000)
+// }).then(res=>{
+//   console.log('then ', res)
+// }).finally(r=>{
+//   console.log('fny ',r)
+// })
+
+const fin1 = new Promise((resolve)=>{
+  console.log(1)
+  setTimeout(()=>{
+    console.log(2)
+    resolve(3)
+    return 'ddff'
+  },0)
+})
+const fin2 = fin1.finally(()=>{
+  console.log('ffff ')
+})
+console.log('12eeee ',fin2)
+  </script>
+</html>

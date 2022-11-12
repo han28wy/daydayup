@@ -1,0 +1,690 @@
+<html>
+
+<head style="background: lightseagreen;">
+</head>
+
+<body>
+</body>
+<script>
+    const treeArray = [{
+            id: 1,
+            name: '部门1',
+            pid: 0
+        },
+        {
+            id: 2,
+            name: '部门2',
+            pid: 1
+        },
+        {
+            id: 3,
+            name: '部门3',
+            pid: 1
+        },
+        {
+            id: 4,
+            name: '部门4',
+            pid: 3
+        },
+        {
+            id: 5,
+            name: '部门5',
+            pid: 4
+        },
+        {
+            id: 6,
+            name: '部门6',
+            pid: 3
+        },
+    ]
+    // 扁平化数组
+    // 递归  这个方法是性能蛮差的方法
+    function getChildNode(arr, id) {
+      const res = [];
+      for (const item of arr) {
+        if (item.pid === id) {
+          res.push({
+            ...item,
+            children: getChildNode(arr, item.id),
+          });
+        }
+      }
+      return res;
+    }
+
+    // 用map的方法
+    function flateen2(arr,pid){
+      let map=new Map()
+      for(let item in arr){
+          if(!map.has(item.id)){
+              map.set(item.id, {...item, children:[]})
+          }else{
+              map.set(item.id, {...map.get(item.id),...item})
+          }
+
+          if(map.has(item.pid)){
+              map.get(item.pid).children.push(map.get(item.id))
+
+          }else{
+              map.set(item.pid, {children:[map.get(item.id)]})
+          }
+      }
+    }
+
+    // 测试一下
+    // const treeRes = getChildNode(treeArray, 0)
+    const treeRes = flateen2(treeArray, 0);
+    console.log(8888);
+    console.log(treeRes);
+
+    //   1 手写jsonp
+    //设计原理是，客户传递一个callback参数给服务器端，然后服务器返回数据时候把callback参数作为函数名来包裹住JSON数据，
+    //并构造出一个执行该函数的字符串，返回的字符串能直接作为js执行，这样客户端就可以定制自己的函数以处理返回的数据
+    // 因为script标签发起的请求的 response 的 content-type 是application/javascript ，这样保证返回的字符串能当做js直接执行，就和一个js文件一样。
+    function jsonp(url, params, callback) {
+      // 判断是否有参数
+      let queryString = url.indexof("?") === "-1" ? "?" : "&";
+      //添加参数
+      for (var k in params) {
+        if (params.hasOwnProperty(k)) {
+          queryString += k + "=" + params[k] + "&";
+        }
+      }
+      //处理回调函数名
+      let random = Math.random().toString.replace(".", "");
+      callbackName = "myJsonp" + random;
+      //添加回调函数到处理后的参数里
+      queryString += "callback=" + callbackName;
+      //封装请求
+      let scriptNode = document.createElement("script");
+      scriptNode.src = url + queryString;
+
+      window[callbackName] = function () {
+        // 调用这个回调函数
+        callback(...arguments);
+        // 删除这个引入的脚本
+        document.getElementsByTagName("head")[0].removeChild(scriptNode);
+      };
+      // 发起请求
+      document.getElementsByTagName("head")[0].appendChild(scriptNode);
+    }
+
+    //   2 用promise实现每隔一秒输出1 2 3
+    // reduce((pre,curr,index,arr)=>{}, init)
+    function f1() {
+      const arr = [1, 2, 3];
+      arr.reduce((p, x) => {
+        return p.then(() => {
+          return new Promise((resolve) => {
+            setTimeout(() => resolve(console.log(x)), 1000);
+          });
+        });
+      }, Promise.resolve());
+    }
+
+    // 这个是只用定时器实现
+    function f2() {
+      for (let i = 1; i < 4; i++) {
+        setTimeout(function () {
+          console.log(j);
+        }, 1000 * i);
+      }
+    }
+    // promise版本
+    // 结果还是不太对啊
+    // var i = 1
+    // while (i < 4) {
+    //     let proRes = _pro(i)
+    //     proRes.then((r) => {
+    //         console.log(r)
+    //     })
+    //     i = i + 1
+    // }
+
+    // function _pro(interval) {
+    //     console.log(11111)
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             resolve(interval)
+    //         }, 1000)
+    //     })
+    // }
+    //   3 手写promise.all
+    function myPromiseAll(promiseList) {
+      return new Promise(
+        (resolve, reject) => {
+          let resList = [];
+          let count = 0;
+          for (let i = 0; i < promiseList.length; i++) {
+            promiseList[i]
+              .then((result) => {
+                resList[i] = result;
+                count++;
+                if (count === promiseList.length) {
+                  resolve(resList);
+                }
+              })
+              .catch(() => {
+                reject("eee");
+              });
+          }
+        },
+        (err) => {
+          return reject(error);
+        }
+      );
+    }
+    let p1 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(1);
+      }, 1000);
+    });
+    let p2 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(2);
+      }, 2000);
+    });
+    let p3 = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(3);
+      }, 3000);
+    });
+    // myPromiseAll([p3, p1, p2]).then((res) => {
+    //     console.log(res); // [3, 1, 2]
+    // });
+
+    //   4 查找英文文章中出现频率最高的单词
+    function findMostWord(article) {
+      let resNum = 0;
+      let res = "";
+      article = article.trim().toLowerCase();
+      let wordMap = new Map();
+      let reg = new RegExp("[a-z]");
+      for (let i = 0; i < article.length; i++) {
+        if (!reg.test(article[i])) {
+          console.log("找到了不符合的字母 ", article[i]);
+          continue;
+        }
+        if (wordMap.get(article[i])) {
+          val = wordMap.get(article[i]) + 1;
+          wordMap.set(article[i], val);
+          if (resNum < val) {
+            res = article[i];
+            resNum = val;
+          }
+        } else {
+          wordMap.set(article[i], 1);
+        }
+      }
+      console.log(res);
+      console.log(resNum);
+      return res;
+    }
+    // findMostWord('a?ab-bbccd')
+
+    //   5 封装js的类型判断函数
+    function type(value) {
+      console.log(value);
+      if (value === null) return value + "";
+      // 判断引用类型的情况
+      //  Object.prototype.toString.call(value) Object.hasOwnProperty.toString.call(value)
+      if (typeof value === "object") {
+        console.log(123);
+        let valueClass = Object.prototype.toString.call(value);
+        type = valueClass.split(" ")[1];
+        type = type.substring(0, type.length - 1);
+        return type;
+      } else {
+        console.log(234);
+        return typeof value;
+      }
+    }
+    // res = type({name:'345',age:123})
+
+    //   6 实现lodash中的get函数
+
+    //   7 实现斐波那契数列
+    function fbnc(n) {
+      // 会出现内存不够大的情况
+      if (n === 1) return 1;
+      if (n === 2) return 1;
+      return fbnc(n - 1) + fbnc(n - 2);
+    }
+    res1 = fbnc(3);
+
+    function fbnc2(n) {
+      var n1 = 1,
+        n2 = 1,
+        sum = n2;
+      for (let i = 2; i < n; i++) {
+        sum = n1 + n2;
+        n1 = n2;
+        n2 = sum;
+      }
+      return sum;
+    }
+    res2 = fbnc2(3);
+    //   8 全排列
+    function all(list) {
+        if (list.length === 1) return list
+        var res = list.reduce((result, property) => {
+            console.log('property       ', property)
+            return property.reduce((acc, value) => {
+                console.log('acc    ',acc,'   result  ',result)
+                return acc.concat(result.map(ele => [].concat(ele, value)))
+            }, [])
+        })
+        return res.map(arr => arr.join("+"))
+    }
+    // var tr = all([
+    //     [1, 2, 3],
+    //     ['a', 'b'],
+    //     [7,8,9]
+    // ])
+
+    //   9 防抖
+    function debounce(fn, delay) {
+      let timer = null;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn();
+      }, delay);
+    }
+
+    //   10 节流 我觉得这个需要好好打磨一下
+    var flag = true;
+
+    function throttle1(fn, delay = 1000) {
+      if (!flag) return;
+      setTimeout(function () {
+        fn();
+        flag = true;
+      }, delay);
+      flag = false;
+    }
+
+    function output() {
+      console.log("输出");
+    }
+
+    //   11 合并k个升序链表
+    function merge(lists) {
+      if (lists.length === 0) return null;
+      if (lists.length === 1) return lists[0];
+
+      let index = Math.floor(lists.length / 2);
+    }
+
+    //   14 js的二分查找
+    // 要求查找的数组是有序的，key为目标
+    function search(arr, key) {
+      let start = 0;
+      let end = arr.length - 1;
+      while (start < end) {
+        let mid = parseInt((start + end) / 2);
+        if (key === arr[mid]) {
+          return mid;
+        } else if (key > arr[mid]) {
+          start = mid + 1;
+        } else {
+          end = mid - 1;
+        }
+      }
+      // 如果没有找到
+      return -1;
+    }
+
+    // 16 实现字符串复制拼接
+    function repeat(arr, n) {
+      let a = new Array(n).fill(arr);
+      return a.join("");
+    }
+
+    function repeat2(arr, n) {
+      return new Array(n + 1).join(arr);
+    }
+    // rep1 = repeat('abc',3)
+    // console.log(rep1)
+    // rep2 = repeat2('cvb',4)
+    // console.log(rep2)
+
+    // 21 生成1-1000的数组
+    function f() {
+      return Array.from(new Array(1000).keys()).slice(1);
+    }
+
+    // 23 用setTimeout实现setInterval
+    // 这个答案写完之后感觉不太对
+    // function mySetInterval(fn,timeout){
+    //     var tiner ={
+    //         flag:true
+    //     }
+    //     function interval(){
+    //         if(timer.flag){
+    //             fn()
+    //             setTimeout(interval,timeout)
+    //         }
+    //     }
+    //     setTimeout(interval, timeout)
+    //     return timer
+    // }
+
+    function myInterval(fn, interval) {
+      function interval() {
+        setTimeout(interval, interval);
+        fn();
+      }
+      setTimeout(interval, interval);
+    }
+    // function test(){
+    //     console.log('我在test interval')
+    // }
+    // myInterval(test, 2000)
+
+    // 26 解析url
+    function parseURL(url) {
+      const a = document.createElement("a");
+      a.herf = url;
+      return {
+        source: url,
+        protocal: a.protocol.replace(":", ""),
+        host: a.hasAttribute,
+        port: a.port,
+        query: a.search, // 查询字符串
+        params: (function () {
+          let ret = {};
+          seg = a.search.replace("/", "").split("&");
+          (len = seg.length), (i = 0), s;
+          for (let i = 0; i < len; i++) {
+            if (!seg[i]) continue;
+            s = seg[i].split("=");
+            ret[s[0]] = decodeURIComponent(s[1]);
+          }
+          return rec;
+        })(),
+        file: (a.pathname.match(/\/([^\/?#]+)$/i) || [, ""])[1],
+        hash: a.hash.replace("#", ""),
+      };
+    }
+
+    // function parseURL2(url) {
+    //     var result = {}
+    //     var keys = ['href', 'origin', 'protocol', 'host', 'hostname', 'search', 'hash']
+    // }
+    // 12基数排序
+
+    // 3桶排序
+    // 时间复杂度o(m+n) 空间消耗很大，要提前知道最大和最小值
+    function bucketSort(arr) {
+      var newList = new Array(arr.length).fill(0);
+      arr.forEach((el) => (newList[el] += 1));
+      return newList.reduce((prev, curr, index) => {
+        for (let i = curr; i; i--) {
+          pre.push(index);
+        }
+        return pre;
+      }, []);
+    }
+
+    // 36 手写快速排序
+    // 随便选择一个基准piv, 分成大于p和小于p的两组数
+    function quickSort(arr) {
+      if (arr.length <= 1) {
+        return arr;
+      }
+      // 1. 找到数组的中间项，在原有的数组中把它移除
+      const middleIndex = Math.floor(arr.length / 2);
+      const middle = arr.splice(middleIndex, 1)[0];
+      // 2. 准备左右两个数组，循环剩下数组中的每一项，比当前项小的放到左边数组中，反之放到右边数组中
+      const leftArr = [];
+      const rightArr = [];
+      for (let i = 0; i < arr.length; i++) {
+        const current = arr[i];
+        current < middle ? leftArr.push(current) : rightArr.push(current);
+      }
+      // 3. 递归方式让左右两边的数组持续这样处理，一直到左右两边都排好序为止。
+      //（最后让左边+中间+右边拼接成最后的结果）
+      return quickSort(leftArr).concat(middle, quickSort(rightArr));
+    }
+
+    // 37 手写并归排序
+
+    // 38 手写希尔排序
+
+    // 39 手写插入排序
+    // 当成已经有一个构建好的有序数列，然后当前数，从后往前扫描有序数列
+    function insertSort(arr) {
+      for (let i = 1; i < arr.length; i++) {
+        let j = i - 1;
+        while (arr[j] > arr[i] && j >= 0) {
+          // 这是需要把前面的重新排序
+          arr[j + 1] = arr[j]; //把arr[i]继续与前面的比较
+          j--;
+        }
+        arr[j + 1] = arr[i];
+      }
+      return arr;
+    }
+
+    // 40 选择排序
+    // 每次找到最小的，放到起始位置
+    function selectionSort(arr) {
+      for (let i = 0; i < arr.length - 1; i++) {
+        let currMin = arr[i];
+        let minIndex = i;
+        for (let j = i + 1; j < arr.length; j++) {
+          if (currMin > arr[j]) {
+            currMin = arr[j];
+            minIndex = j;
+          }
+        }
+        let temp = arr[i];
+        a[i] = currMin;
+        arr[minIndex] = temp;
+      }
+      return arr;
+    }
+
+    // 41 冒泡排序
+    function bubble(arr) {
+      // 从小到大排序
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr.length - i - 1; j++) {
+          if (arr[j] > arr[j + 1]) {
+            let temp = arr[j + 1];
+            arr[j + 1] = arr[j];
+            arr[j] = temp;
+          }
+        }
+      }
+      return arr;
+    }
+
+    // 46 实现有并行限制的Promise调度器
+    // 保证同时运行的任务最多2个
+    class Schedule {
+      constructor(limit) {
+        this.queue = [];
+        this.maxCount = 2;
+        this.runCount = 0;
+      }
+
+      add(promiseCreator) {
+        this.queue.push(promiseCreator);
+      }
+      taskStart() {
+        for (let i = 0; i < this.maxCount; i++) {
+          this.request();
+        }
+      }
+      request() {
+        if (!this.queue || !this.queue.length || this.runCount > this.maxCount)
+          return;
+        this.runCount++;
+        this.queue
+          .shift()()
+          .then(() => {
+            //shift() 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。
+            this.runCount--;
+            this.request();
+          });
+      }
+    }
+    const scheduler = new Schedule();
+    const timeout = (time) => {
+      new Promise((resolve) => {
+        setTimeout(resolve, time);
+      });
+    };
+    const addTask = (time, order) => {
+      scheduler.add(time, order);
+    };
+    // addTask(1000, '1')
+    // addTask(600, '2')
+    // addTask(700, '3')
+    // addTask(500, '4')
+    // addTask(200, '5')
+    // addTask(100, '6')
+    // scheduler.taskStart()
+
+    // 50 实现object.assign
+    // 浅拷贝
+    // 这个写的是什么，我也看不太懂
+    // Object.defineProperties(Object, 'assign', {
+    //     value: function (target, ...args) {
+    //         if (target === null) {
+    //             return new TypeError('error !!')
+    //         }
+    //         const to = Object(target) // 目标对象需要统一是引用类型，否则不会自动转化的
+    //         for (let i = 0; i < args.length; i++) {
+    //             const nextSource = args[i]
+    //             if (nextSource !== null) {
+    //                 for (const nextKey in nextSource) {
+    //                     if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+    //                         to[nextKey] = nextSource[nextKey]
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         return to
+    //     }
+    // })
+
+    // 52 实现函数柯里化
+    function add() {
+      const _args = [...arguments];
+
+      function fn() {
+        _args.push(...arguments);
+        return fn;
+      }
+      fn.toString = function () {
+        return _args.reduce((sum, cur) => {
+          sum + cur;
+        });
+      };
+      return fn;
+    }
+
+    // 59 实现forEach
+    Array.prototype.forEach = function (callback, context) {
+      for (let i = 0; i < this.length; i++) {
+        callback.call(context, this[i], i);
+      }
+    };
+    // 60 实现map
+    Array.prototype.map = function (fn) {
+      let newArr = [];
+      for (let i = 0; i < this.length; i++) {
+        newArr.push(fn(this[i], i, this));
+      }
+      return newArr;
+    };
+    // 比较一下forEach和map
+    // 传参(curr, index, array)
+    // map 不改变原来的数组，返回新数组，break可以终止循环，可以用return返回到外层的函数
+    // forEach 其实和for差不多，没有返回值，不能中断，不能返回到外层函数
+
+    // 65 数组去重的很多种方法
+    // 1用set   
+    // Array.from(new Set(arr))
+    // 2 双层for+splice
+    const unique2 = (arr) => {
+      let len = arr.length;
+      for (let i = 0; i < len; i++) {
+        for (let j = i + 1; j < len; i++) {
+          if (arr[i] === arr[j]) {
+            arr.splice(j, 1);
+            len--;
+            j--;
+          }
+        }
+      }
+      return arr;
+    };
+    // 3 indexof 与include同理
+    const unique3 = (arr) => {
+      const res = [];
+      for (let i = 0; i < len; i++) {
+        if (res.indexof(arr[i]) === -1) {
+          res.push(arr[i]);
+        }
+      }
+    };
+    // 4 filter
+    const unique4 = (arr) => {
+      return arr.filter((item, index) => {
+        return arr.indexof(item) === item;
+      });
+    };
+    //   66 实现上拉加载，下拉刷新
+    // 这里面说了一些第三方的解决方案 iscroll better-scroll pulltorefresh.jsonp
+
+    //   69 购物车的逻辑
+
+    // 70 手写一个深拷贝
+    function deepClone(target) {
+      let res = null;
+
+      // 如果是基本类型，直接返回
+      if (!typeof target === "object") {
+        res = target;
+      }
+      // 如果是引用类型
+      // 如果是数组
+      if (Array.isArray(target)) {
+        res = new Array(target.length);
+        target.forEach(item, (index) => {
+          res[index] = deepClone(item);
+        });
+      } else {
+        // 如果是对象类型
+        res = {};
+        for (ele in target) {
+          res[ele] = deepClone(target.ele);
+        }
+      }
+      return res;
+    }
+    function deepCloneHash(target, hash = new WeakMap()) {
+      // 额外开辟一个存储空间WeakMap来存储当前对象
+      if (target === null) return target; // 如果是 null 就不进行拷贝操作
+      if (target instanceof Date) return new Date(target); // 处理日期
+      if (target instanceof RegExp) return new RegExp(target); // 处理正则
+      if (target instanceof HTMLElement) return target; // 处理 DOM元素
+
+      if (typeof target !== "object") return target; // 处理原始类型和函数 不需要深拷贝，直接返回
+
+      // 是引用类型的话就要进行深拷贝
+      if (hash.get(target)) return hash.get(target); // 当需要拷贝当前对象时，先去存储空间中找，如果有的话直接返回
+      const cloneTarget = new target.constructor(); // 创建一个新的克隆对象或克隆数组
+      hash.set(target, cloneTarget); // 如果存储空间中没有就存进 hash 里
+
+      Reflect.ownKeys(target).forEach((key) => {
+        // 引入 Reflect.ownKeys，处理 Symbol 作为键名的情况
+        cloneTarget[key] = deepClone(target[key], hash); // 递归拷贝每一层
+      });
+      return cloneTarget; // 返回克隆的对象
+    }
+  </script>
+</html>

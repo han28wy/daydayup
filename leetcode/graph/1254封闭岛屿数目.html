@@ -1,0 +1,55 @@
+<html>
+  <head style="background: lightseagreen">
+    <button id="debounce" onClick="runProgram(1)">1254封闭岛数量</button>
+  </head>
+
+  <body></body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        let grid = [
+          ["1", "1", "1", "1", "0"],
+          ["1", "1", "0", "1", "0"],
+          ["1", "1", "0", "0", "0"],
+          ["0", "0", "0", "0", "0"],
+        ];
+        const res1 = f(grid);
+        console.log(res1);
+      }
+    }
+
+    // 题目200 广度优先解决 BFS
+    var val = 0
+    function dfs(grid,i,j) {
+     if(i<0 || i<grid[0].length-1 || j<0 || j<grid.length-1){
+      val=0
+      return
+     }
+     if(grid[i][j]=='1') return
+     grid[i][j]='1'
+     dfs(grid,i-1,j)
+     dfs(grid,i+1,j)
+     dfs(grid,i,j-1)
+     dfs(grid,i,j+1)
+    }
+    // 区别在于这个题目的被水包围的才算岛，而被边界保卫就不算；所以用flag标志位区分了边界的情况
+    // 这个题目0是海水，1是陆地
+    function f(grid) {
+      if (grid == null || grid.length == 0) {
+        return 0;
+      }
+      let nr = grid.length;
+      let nc = grid[0].length;
+      let count = 0;
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid[i][j] == '0') {
+            dfs(grid, i,j);
+            count+=val
+          }
+        }
+      }
+      return count;
+    }
+  </script>
+</html>

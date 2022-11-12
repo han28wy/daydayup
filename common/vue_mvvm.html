@@ -1,0 +1,42 @@
+<html>
+  <head style="background: lightseagreen">
+    手写双向绑定
+  </head>
+  <body>
+      <input type="text" id="model">
+      <div id="modelText" />
+  </body>
+  <script>
+      var user = {
+          name:"hhhh",
+          age:123
+      }
+      var input=document.querySelector("#model");
+      var text = document.querySelector("#modelText")
+      input.value = user.name
+      text.textContent = user.name
+      setTimeout(()=>{
+          user.name='zhuzhuzhuzhu'
+      },2000)
+      // 数据到视图
+      Object.defineProperty(user,"name",{
+        //   发现只要是数据有变化都会调用这里重新set
+          set:function(newValue){
+            console.log('我在set ')
+            text.textContent  = newValue;
+            input.value = newValue; // 直接修改了dom元素里的数据
+          },
+          get:(val)=>{
+              console.log('我在get shenme doumeizuo ')
+          }
+      })
+      
+      // 视图到数据
+      input.addEventListener('input',function(val){
+          console.log('我在从视图到数据')
+          user.name = input.value
+      })
+
+
+  </script>
+</html>

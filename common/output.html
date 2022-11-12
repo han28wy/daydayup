@@ -1,0 +1,29 @@
+<html>
+  <head style="background: lightseagreen"></head>
+  <body>
+    <div id="d1">间隔1s,依次输出数字</div>
+  </body>
+  <script>
+    function test1() {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          console.log(new Date(), "   ", i);
+        }, i * 1000);
+      }
+    }
+    // 输出1，2，3，4，5
+    // test1()
+
+    //这个自执行函数，效果和let j=i一样
+    function test3() {
+      for (var i = 0; i < 5; i++) {
+        (function (j) {
+          setTimeout(function () {
+            console.log(new Date(), "   ", j);
+          }, i * 1000);
+        })(i);
+      }
+    }
+    test3();
+  </script>
+</html>

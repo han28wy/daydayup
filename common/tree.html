@@ -1,0 +1,139 @@
+<html>
+  <head>
+    333
+  </head>
+  <body>
+    <br />
+    <button id="throttle">title 标题这是</button>
+  </body>
+  <script>
+    const tree = [
+      {
+        id: 01,
+        pid: null,
+        children: [
+          {
+            id: 03,
+            pid: 01,
+            children: [
+              { id: 04, pid: 03, children: [] },
+              { id: 06, pid: 03, children: [] },
+            ],
+          },
+          { id: 05, pid: 01, children: [] },
+        ],
+      },
+      {
+        id: 02,
+        pid: null,
+        children: [
+          {
+            id: 07,
+            pid: 02,
+            children: [
+              { id: 10, pid: 07, children: [] },
+              { id: 11, pid: 07, children: [] },
+            ],
+          },
+          { id: 09, pid: 02, children: [] },
+        ],
+      },
+    ];
+    const treeList = [
+      { id: 01, pid: null },
+      { id: 02, pid: null },
+      { id: 03, pid: 01 },
+      { id: 04, pid: 03 },
+      { id: 05, pid: 01 },
+      { id: 06, pid: 03 },
+      { id: 07, pid: 02 },
+      { id: 09, pid: 02 },
+      { id: 10, pid: 07 },
+      { id: 11, pid: 07 },
+    ];
+    // 1 一维数组转tree
+    function findTargetNode(list, parId, childNode) {
+      list.forEach((item) => {
+        if (parId === item.id) {
+          item.children.push(childNode);
+          return list;
+        }
+      });
+    }
+
+    function listToTree(list, pid) {
+      list.forEach((item, index) => {
+        if (item.pid === pid) {
+          if (pid === null) {
+            item.children = [];
+            listToTree(treeList, item.id);
+          } else {
+            item.children = [];
+            findTargetNode(treeList, pid, item);
+            listToTree(treeList, item.id);
+          }
+        }
+      });
+      return treeList;
+    }
+    // const result = listToTree(treeList, null, {});
+    // console.log(result); // 这样子输出有正确结果，但是返回treeList是完整的每个都没少的数据
+
+    // 查找某个节点
+    // 这个是采用先序遍历
+    function treeForeach_pre(tree, func) {
+      tree.forEach((data) => {
+        func(data);
+        data.children && treeForeach_pre(data.children, func); // 遍历子树
+      });
+      return tree
+    }
+    function func(data) {
+        data.new = data.pid
+        return data
+    }
+    // 看一下后序遍历是什么 从子节点到根节点
+    function treeForeach_aft(tree, func) {
+      tree.forEach((data) => {
+        data.children && treeForeach_aft(data.children, func); // 遍历子树
+        func(data);
+      });
+      return tree
+    }
+    // const newTree_aft = treeForeach_aft(tree, func)
+    // console.log('转化后')
+    // console.log(newTree_aft)
+    // const newTree_pre = treeForeach_pre(tree, func)
+    // console.log('转化后 pre')
+    // console.log(newTree_pre)
+    //////
+    /// 给树添加一个节点
+    function operateNode(tree, targetNode){
+        tree.forEach(item=>{
+            if(targetNode.pid === item.id){
+                item.children.push(targetNode)
+            }else{
+                item.children && operateNode(item.children, targetNode)
+            }
+        })
+        return tree
+    }
+    // const newAddTree = operateNode(tree, {id:12,pid:2,children:[]})
+    // console.log('新增后的node')
+    // console.log(newAddTree)
+    
+    // 手写树形结构扁平化
+    function flatTree(res, tree){
+      tree.reduce((pre,curr)=>{
+        res=pre.push({id:curr.id,pid:curr.pid})
+        if(curr.children.length>0){
+          return flatTree(res, curr.children)
+        }
+      })
+      return res
+    }
+    var flatResult = flatTree(tree)
+    console.log('tyr444 ')
+    console.log(flatResult)
+  </script>
+</html>

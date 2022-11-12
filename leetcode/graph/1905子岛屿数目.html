@@ -1,0 +1,114 @@
+<html>
+  <head style="background: lightseagreen">
+    <button id="debounce" onClick="runProgram(1)">1905 子岛屿数目</button>
+  </head>
+
+  <body></body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        const grid11 = [
+          [1, 1, 1, 0, 0],
+          [0, 1, 1, 1, 1],
+          [0, 0, 0, 0, 0],
+          [1, 0, 0, 0, 0],
+          [1, 1, 0, 1, 1],
+        ];
+        const grid12 = [
+          [1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1],
+          [0, 1, 0, 0, 0],
+          [1, 0, 1, 1, 0],
+          [0, 1, 0, 1, 0],
+        ];
+        const res1 = f1905(grid11, grid12);
+        console.log(res1);
+      }
+    }
+
+    // 广度优先解决 BFS
+    function turnzero(queue, grid1, grid2) {
+      let dirs = [
+        [0, 1],
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+      ];
+      while (queue.length) {
+        const curr = queue.shift(); // 取出队列的第一个元素
+        for (const dir of dirs) {
+          const x = curr[0] + dir[0];
+          const y = curr[1] + dir[1];
+          if (
+            x < 0 ||
+            x >= grid2.length ||
+            y < 0 ||
+            y >= grid2[0].length ||
+            grid2[x][y] == "0"
+          ) {
+            continue;
+          }
+          grid2[x][y] = "0";
+          queue.push([x, y]);
+        }
+      }
+    }
+    function f200_bfs(grid1, grid2) {
+      let res = 0;
+      let nr = grid2.length;
+      let nc = grid2[0].length;
+      let queue = [];
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid2[i][j] == "1") {
+            grid2[i][j] = "0";
+            queue.push([i, j]);
+            let curr = turnzero(queue, grid1, grid2);
+            res += curr;
+          }
+        }
+      }
+      return res;
+    }
+
+    // 问题是，dfs方法改变了grid2数组，但是再function作用域里无法得到已更改的grid2
+    // 用深度优先解决这个问题吧
+    var count = 0;
+    function dfs3(grid1, grid2, i, j) {
+      if (
+        i < 0 ||
+        i >= grid2.length ||
+        j < 0 ||
+        j >= grid2[0].length ||
+        grid2[i][j] == 0
+      )
+        return;
+      grid2[i][j] = 0;
+      //  console.log(i,'    ',j,'      ',grid1[i][j],'     ',grid1[i][j] == 0)
+      if (grid1[i][j] == 0) {
+        console.log("我在里rr面的");
+        count = 0;
+      }
+      dfs(grid1, grid2, i - 1, j);
+      dfs(grid1, grid2, i + 1, j);
+      dfs(grid1, grid2, i, j - 1);
+      dfs(grid1, grid2, i, j + 1);
+    }
+    function f1905(grid1, grid2) {
+      let nr = grid2.length;
+      let nc = grid2[0].length;
+      let result = 0;
+      for (let i = 0; i < nr; ++i) {
+        for (let j = 0; j < nc; ++j) {
+          if (grid2[i][j] == 1) {
+            count = 1;
+            dfs(grid1, grid1, i, j)
+            result += count;
+          }
+        }
+      }
+      console.log(grid2);
+      return result;
+    }
+  </script>
+</html>

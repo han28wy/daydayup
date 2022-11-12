@@ -1,0 +1,42 @@
+<html>
+  <head style="background: lightseagreen;">
+    header
+  </head>
+  <body>
+      <div id="block" style="background-color: blueviolet;width:100px;height:100px">
+  </body>
+  <script>
+    // 40 计算一个页面有多少种标签
+    // new Set([...document.querySelectorAll('*')].map(ele=>ele.tagName)).size
+    //41 base64编码图片
+    // 是用64个基本的ASCII 码对数据编码。
+
+    // 实现拖拽
+        const b = document.getElementById('block')
+        b.addEventListener('dragstart', (e)=>{
+            console.log('111   ', e)
+        })
+        b.addEventListener('mousedown', (e)=>{
+            // console.log('111   ', e)
+            // console.log(e.target)
+            // console.log(e.target.style)
+        })
+        b.addEventListener('mousemove',  throtte(fun))
+        function fun() {
+            console.log(12333)
+        }
+        // 用节流优化一下
+        function throtte(fn, wait){
+            let enable = true
+            return function(){
+            if(enable) {
+            setTimeout(()=>{
+                fn();
+                enable = true
+            },2000)
+            }}
+            enable = false
+        }
+        // https://juejin.cn/post/6994594642280857630
+  </script>
+</html>

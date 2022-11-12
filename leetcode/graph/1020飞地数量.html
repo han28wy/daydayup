@@ -1,0 +1,44 @@
+<html>
+  <head style="background: lightseagreen">
+    <button id="debounce" onClick="runProgram(1)">1020 飞地数量</button>
+  </head>
+
+  <body></body>
+  <script>
+    function runProgram(val) {
+      if (val === 1) {
+        let grid = [[0,1,1,0],[0,0,1,0],[0,0,1,0],[0,0,0,0]]
+        const res1 = f200_bfs(grid);
+        console.log(res1);
+      }
+    }
+
+    // 题目200 广度优先解决 BFS
+    function turnzero(queue, grid) {
+      let dirs = [
+        [0, 1],
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+      ];
+      while (queue.length) {
+        const curr = queue.shift(); // 取出队列的第一个元素
+        for (const dir of dirs) {
+          const x = curr[0] + dir[0];
+          const y = curr[1] + dir[1];
+          if (
+            x < 0 ||
+            x >= grid.length ||
+            y < 0 ||
+            y >= grid[0].length ||
+            grid[x][y] == '0'
+          ) {
+            continue;
+          }
+          grid[x][y] = "0";
+          queue.push([x, y]);
+        }
+      }
+    }
+  </script>
+</html>

@@ -1,0 +1,38 @@
+<html>
+  <head style="background: lightseagreen">
+    学习websocket
+  </head>
+  <body>
+    <input type="text" id="model" />
+    <div id="modelText" />
+  </body>
+  <script>
+    function connectWebsocket() {
+      ws = new WebSocket("ws://localhost:5500");
+      // 监听连接成功
+      ws.onopen = () => {
+        console.log("连接服务端WebSocket成功");
+        ws.send(JSON.stringify(msgData)); // send 方法给服务端发送消息
+      };
+
+      // 监听服务端消息(接收消息)
+      ws.onmessage = (msg) => {
+        let message = JSON.parse(msg.data);
+        console.log("收到的消息：", message);
+        elUl.innerHTML += `<li class="b">小秋：${message.content}</li>`;
+      };
+
+      // 监听连接失败
+      ws.onerror = () => {
+        console.log("连接失败，正在重连...");
+        connectWebsocket();
+      };
+
+      // 监听连接关闭
+      ws.onclose = () => {
+        console.log("连接关闭");
+      };
+    }
+    connectWebsocket();
+  </script>
+</html>
