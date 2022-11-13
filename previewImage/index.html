@@ -1,0 +1,187 @@
+<html>
+<div>
+
+</div>
+
+</html>
+
+<script>
+    let cloneEl = null
+    let oriEl = null
+    document.getElementById('list').addEventListener('click', function (e) {
+        e.preventDefault()
+        // DOM元素操作 classList属性返回元素的类名！add和remove可以修改
+        if (e.target.classList.contains('item')) {
+            oriEl = e.target // 保留原始DOM节点
+            cloneEl = oriEl.cloneNode(true)
+            oriEl.style.opacity = 0
+            openPreview() // 打开预览
+        }
+    })
+
+    function openPreview() {
+        // 创建蒙版，添加到body下，给他添加点击属性，能够关闭
+        const mask = document.createElement('div')
+        mask.classList.add('modal')
+        document.body.appendChild(mask)
+        const clickFunc = function () {
+            document.body.removeChild(this)
+            oriEl.style.opacity = 1
+            mask.removeEventListener('click', clickFunc)
+        }
+        mask.addEventListener('click', clickFunc)
+        mask.appendChild(cloneEl)
+    }
+    // 用于修改样式的工具类，并且可以减少回流重绘，后面代码中会频繁用到
+    function changeStyle(el, arr) {
+        const original = el.style.cssText.split(';')
+        original.pop()
+        el.style.cssText = original.concat(arr).join(';') + ';'
+    }
+
+    // 克隆出来的图片位置是没有指定的，此时需要用 getBoundingClientRect() 方法获取一下元素
+    // 相对于可视窗口的距离，设置为图片的起始位置，覆盖在原图片的位置之上，以取代文档流中的图片。
+    // 添加图片
+    const {
+        top,
+        left
+    } = originalEl.getBoundingClientRect()
+    changeStyle(cloneEl, [`left: ${left}px`, `top: ${top}px`])
+    mask.appendChild(cloneEl)
+
+    // 把图片放到中心位置
+    const {
+        innerWidth,
+        winWidth,
+        innerHeight,
+        winHeight
+    } = window
+
+    // 计算缩放大小
+    function adaptScale() {
+        const {
+            offsetWidth: w,
+            offsetHeight: h
+        } = oriEl // 读取文档图片的宽高
+        let scale = 0
+        scale = winWidth / w
+        if (h * scale > winHeight - 80) {
+            scale = (winHeight - 80) / h
+        }
+        return scale
+    }
+    // 移动到屏幕中心位置
+    const originalCenterPoint = {
+        x: offsetWidth / 2 + left,
+        y: offsetHeight / 2 + top
+    }
+    const winCenterPoint = {
+        x: winWidth / 2,
+        y: winHeight / 2
+    }
+    const offsetDistance = {
+        left: winCenterPoint.x - originalCenterPoint.x + left,
+        top: winCenterPoint.y - originalCenterPoint.y + top
+    }
+    const diffs = {
+        left: ((adaptScale() - 1) * offsetWidth) / 2,
+        top: ((adaptScale() - 1) * offsetHeight) / 2
+    }
+    changeStyle(cloneEl, ['transition: all 0.3s', `width: ${offsetWidth * adaptScale() + 'px'}`,
+        `transform: translate(${offsetDistance.left - left - diffs.left}px, ${offsetDistance.top - top - diffs.top}px)`
+    ])
+    // 动画结束后消除定位重置的偏差
+    setTimeout(() => {
+        changeStyle(cloneEl, ['transition: all 0s', `left: 0`, `top: 0`,
+            `transform: translate(${offsetDistance.left - diffs.left}px, ${offsetDistance.top - diffs.top}px)`
+        ])
+        offset = {
+            left: offsetDistance.left - diffs.left,
+            top: offsetDistance.top - diffs.top
+        } // 记录值
+    }, 300)
+
+    // 可以把放大到中间的图片，移动
+    // 每次指针按下收记录水平和垂直位移
+    let startPoint = {
+        x: 0,
+        y: 0
+    }
+    let isTouching = false
+    let isMove = false
+    window.addEventListener('pointerdown', function (e) {
+        e.preventDefault()
+        isTouching = true
+        startPoint = {
+            x: e.clientX,
+            y: e.clientY
+        }
+    })
+    window.addEventListener('pointerup', function (e) {
+        isTouching = false
+        setTimeout(() => {
+            isMove = false
+        }, 300)
+    })
+    // 鼠标移动事件
+    window.addEventListener('pointermove', (e) => {
+        if (isTouching) {
+            // 单指滑动/鼠标移动
+            offset = {
+                left: offset.left + (e.clientX - startPoint.x),
+                top: offset.top + (e.clientY - startPoint.y),
+            }
+            changeStyle(cloneEl, [
+                `transform: translate(${offset.left + 'px'}, ${offset.top + 'px'}) scale(${scale})`,
+                `transform-origin: ${origin}`
+            ])
+            // 注意移动完也要更新初始点位，否则图片会加速逃逸可视区域
+            startPoint = {
+                x: e.clientX,
+                y: e.clientY
+            }
+        }
+    })
+    // 缩放事件
+    let touches = new Map() // 触摸点数组
+    window.addEventListener('pointerdown', function (e) {
+        e.preventDefault()
+        touches.set(e.pointerId, e) // TODO: 点击存入触摸点
+        isTouching = true
+        startPoint = {
+            x: e.clientX,
+            y: e.clientY
+        }
+        if (touches.size === 2) {
+            // TODO: 判断双指触摸，并立即记录初始数据
+        }
+    })
+    window.addEventListener('pointerup', function (e) {
+        touches.delete(e.pointerId) // TODO: 抬起时移除触摸点
+        // .....
+    })
+
+    window.addEventListener('pointermove', (e) => {
+        if (isTouching) {
+            isMove = true
+            if (touches.size < 2) {
+                // TODO: 单指滑动，或鼠标拖拽
+            } else {
+                // TODO: 双指缩放
+                touches.set(e.pointerId, e) // 更新点位数据
+                // .......
+            }
+        }
+    })
+</script>
+
+<style>
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+    }
+</style>
