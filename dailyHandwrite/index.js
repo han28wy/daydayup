@@ -28,6 +28,12 @@ function newInstanceOf(left, right) {
 // 问题就是 new和object.create有什么不一样的 ？
 // create():创建一个新对象，带有指定的原型对象和属性
 // new() 创建一个用户定义的对象类型的实例或具有构造函数的内置对象的实例
+
+// 创建新对象；
+// 这个对象内部prototype特性被赋值为构造函数的prototype属性
+// 改变构造函数内部this指向到这个心对象
+// 执行构造函数内部的代码，给新对象添加属性
+// 如果构造函数返回非空对象，则返回该对象，否则，返回刚创建的心对象
 function myNew(fn, ...args) {
     if (typeof fn !== "function") {
         return console.error('sdfasds')
@@ -36,7 +42,13 @@ function myNew(fn, ...args) {
     const value = fn.apply(obj, args) // 调用构造函数，绑定this到obj上
     return value.instanceOf(Object) ? value : obj
 }
-
+function myNew2(){
+    const obj = new Object();
+    Constructor = Array.prototype.shift.call(arguments);
+    obj.__proto__ = Constructor.prototype;
+    let ret = Constructor.apply(obj,arguments);
+    return typeof ret === 'object'? ret : obj;
+}
 // 手写promise相关的很多
 // 一个正常的promise的用法是：
 // const pro = new Promise((resolve)=>{
@@ -91,7 +103,6 @@ myPromise.all = function (promiseList) {
                 reject(err)
             })
         }
-
     })
 }
 
