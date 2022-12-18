@@ -1,0 +1,184 @@
+   <div id="app">
+       <h3>{{title}}</h3>
+   </div>
+   <script>
+       // 响应式实现
+       function reactive(obj) {
+           new Proxy(obj, {
+               get(target, key) {
+                   return target[key]
+               },
+               set(target, key, val) {
+                   target[key] = val
+                   app.update()
+               },
+               deleteProperty() {
+
+               }
+           })
+       }
+       const effectStack = []
+
+       function effect(fn) {
+           effectStack.push(fn)
+           fn()
+           effectStack.pop()
+       }
+
+       const targetMap = {}
+
+       function track(targe t, key) {
+
+       }
+
+       function h(tag, props, children) { // 相当于描述了虚拟dom一个对象
+
+       }
+       const Vue = {
+           createApp(options) {
+               const renderer = Vue.createRenderer({
+                   querySelector(selector) {
+                       parent.insertBefore(child, anchor || null)
+                   },
+                   insert(child, parent, anchor) {
+                       return document.querySelector(selector)
+                   },
+                   createElement(tag) {
+                       return document.createElement(tag)
+                   }
+               })
+               return renderer.createApp(options)
+           },
+
+           createRenderer({
+               querySelector,
+               insert,
+               createElement
+           }) {
+               return {
+                   createApp(options) {
+                       return {
+                           mount(selector) { // 组件解析为dom 
+                               const parent = document.querySelector(selector)
+                               if (!options.render) {
+                                   options.render = this.compile(parent.innerHTML)
+                               }
+                               if (options.setup) {
+                                   // 可以规避this
+                                   this.setupState = options.setup()
+                               } else {
+                                   this.data = options.data()
+                               }
+
+                               this.proxy = new Proxy(this, {
+                                   get(target, key) {
+                                       if (key in target.setupState) {
+                                           return target.setupState[key]
+                                       } else {
+                                           return target.data[key]
+                                       }
+                                   },
+                                   set(target, key, val) {
+                                       if (key in target.setupState) {
+                                           return target.setupState[key] = val
+                                       } else {
+                                           target.data[key] = val
+                                       }
+                                   }
+                               })
+                               this.update = effect(() => {
+                                   //    const el = options.render.call(this.proxy)
+                                   //    // 挂载到宿主
+                                   //    parent.innerHTML = ''
+                                   //    parent.appendChild(el)
+                                   //    Vue.insert(el, parent)
+                                   const vnode = options.render.call(this.proxy)
+                                   if (!this.isMounted) { // 初始化
+                                       const el = this.createElm(vnode) // 虚拟dom转换为真实dom 挂载
+                                       parent.innerHTML = ''
+                                       insert(el, parent)
+                                       this.isMounted = true
+                                   } else { // 更新
+                                       this.patch(this._vnode, vnode) // 比较上次和本次结果，只更新变化的
+                                   }
+                                   this._vnode = vnode
+                               })
+                               this.update()
+                           },
+                           createElm(vnode) {
+                               const el = createElement(vnode.tag)
+                               // props先省略掉
+                               if (typeof vnode.child === 'string') {
+                                   el.textContent = vnode.children
+                               } else {
+                                   vnode.children.forEach(child => {
+                                       insert(this.createElm(child), el)
+                                   })
+                               }
+                               vnode.el = el
+                               return el
+                           }
+                           patch(n1, n2) {
+                               const el = n2.el = n1.el
+                               // 判断是否是相同节点
+                               if (n1.tag === n2.tag) {
+                                   const oldCh = n1.children
+                                   const newCh = n2.children
+                                   if (typeof oldCh === 'string') {
+                                       if (typeof newCh === 'string') { // 做文本更新
+                                           if (oldCh !== newCh) {
+                                               el.textContent = newCh
+                                           }
+                                       } else {
+                                           el.textContent = ''
+                                           newCh.forEach(child => {
+                                               insert(this.createElm(child), el)
+                                           })
+                                       }
+                                   } else { // n1是一组子元素
+                                       if (typeof newCh === 'string') {
+                                           el.textContent = newCh
+                                       } else {
+                                           // 这种是最复杂的情况；
+                                       }
+                                   }
+
+                               }
+
+                           }
+                           compile(template) {
+                               return function render() {
+                                   //    const h3 = document.createElement('h3')
+                                   //    h3.textContent = this.title
+                                   //    return h3
+                                   return h('h3', null, this.title)
+                               }
+                           }
+                       }
+                   }
+               }
+           }
+       }
+   </script>
+   <script>
+       const {
+           createApp,
+           reactive,
+           onMounted
+
+       } = Vue
+       const app = createApp({
+           setup() {
+               const state = reactive({
+                   title: 'hello vue5553'
+               })
+               onMounted(() => {
+                   state.title = '9999'
+               })
+               return {
+                   state
+               }
+           },
+       })
+       app.mount('#app')
+   </script>
